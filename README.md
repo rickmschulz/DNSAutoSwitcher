@@ -15,17 +15,20 @@ Since Android does not natively allow you to disable "Private DNS" for specific 
 
 ### 1. Install the App
 
-Build the APK using Android Studio or download the release and install it on your device.
+Build the APK using [Android Studio](https://developer.android.com/studio) or download the [release](https://github.com/rickmschulz/DNSAutoSwitcher/releases/) and install it on your device.
 
 ### 2. Grant Permissions (Crucial)
 
-Because changing system settings is a secure action, you must grant the app permission via ADB **once** after installation.
+Because changing system settings is a secure action, you must grant the app permission via [ADB](https://developer.android.com/tools/adb) **once** after installation.
 
 Connect your phone to your PC and run:
 
 ```
 adb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECURE_SETTINGS
 ```
+
+> [!TIP]
+> If you need help with ADB, this [page](https://developer.android.com/tools/adb) can help you.
 
 ### 3. Configure
 
