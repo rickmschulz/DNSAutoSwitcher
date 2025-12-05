@@ -1,7 +1,10 @@
 package com.rickmschulz.dnsautoswitcher;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -12,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextInputEditText inputSSID;
     private TextInputEditText inputDNS;
+    private Button btnAction;
     private SharedPreferences prefs;
 
     @Override
@@ -19,37 +23,99 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize Views
         inputSSID = findViewById(R.id.input_ssid);
         inputDNS = findViewById(R.id.input_dns_id);
-        Button btnSave = findViewById(R.id.btn_save);
+        btnAction = findViewById(R.id.btn_save);
 
-        // Load saved settings
         prefs = getSharedPreferences("DNSAutoSwitcherPrefs", MODE_PRIVATE);
         inputSSID.setText(prefs.getString("home_ssid", ""));
         inputDNS.setText(prefs.getString("privatedns_id", ""));
 
-        // Save Button Logic
-        btnSave.setOnClickListener(v -> {
-            String ssid = inputSSID.getText().toString().trim();
-            String dnsId = inputDNS.getText().toString().trim();
+        // Perform initial check
+        syncServiceState();
+        updateUI();
 
-            if (ssid.isEmpty() || dnsId.isEmpty()) {
-                Toast.makeText(this, "Please fill in both fields", Toast.LENGTH_SHORT).show();
-                return;
+        btnAction.setOnClickListener(v -> {
+            if (DNSService.isRunning) {
+                stopService();
+            } else {
+                saveAndStartService();
             }
-
-            // Save to storage
-            prefs.edit()
-                    .putString("home_ssid", ssid)
-                    .putString("privatedns_id", dnsId)
-                    .apply();
-
-            // Start the Service
-            Intent serviceIntent = new Intent(this, DNSService.class);
-            startForegroundService(serviceIntent);
-
-            Toast.makeText(this, "Settings Saved & Service Started!", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // "Reality Check": Every time the screen appears, check if the service is actually alive
+        syncServiceState();
+        updateUI();
+    }
+
+    /**
+     * Checks if the service is actually running in the Android System
+     * and updates the static flag to match reality.
+     */
+    private void syncServiceState() {
+        boolean actuallyRunning = false;
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (DNSService.class.getName().equals(service.service.getClassName())) {
+                actuallyRunning = true;
+                break;
+            }
+        }
+        DNSService.isRunning = actuallyRunning;
+    }
+
+    private void saveAndStartService() {
+        String ssid = inputSSID.getText().toString().trim();
+        String dnsId = inputDNS.getText().toString().trim();
+
+        if (ssid.isEmpty() || dnsId.isEmpty()) {
+            Toast.makeText(this, "Please fill in both fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        prefs.edit()
+                .putString("home_ssid", ssid)
+                .putString("privatedns_id", dnsId)
+                .apply();
+
+        Intent serviceIntent = new Intent(this, DNSService.class);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
+
+        // Assume start was successful for immediate UI feedback
+        DNSService.isRunning = true;
+        updateUI();
+        Toast.makeText(this, "Service Started!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void stopService() {
+        Intent serviceIntent = new Intent(this, DNSService.class);
+        stopService(serviceIntent);
+
+        // Update flag immediately
+        DNSService.isRunning = false;
+        updateUI();
+        Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateUI() {
+        if (DNSService.isRunning) {
+            btnAction.setText("STOP SERVICE");
+            btnAction.setBackgroundColor(Color.parseColor("#D32F2F")); // Red
+            inputSSID.setEnabled(false);
+            inputDNS.setEnabled(false);
+        } else {
+            btnAction.setText("SAVE & START SERVICE");
+            btnAction.setBackgroundColor(Color.parseColor("#1976D2")); // Blue
+            inputSSID.setEnabled(true);
+            inputDNS.setEnabled(true);
+        }
     }
 }
