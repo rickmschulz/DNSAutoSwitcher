@@ -4,7 +4,9 @@ A lightweight Android application that automatically toggles "Private DNS" setti
 
 ## Why this exists
 
-Let's consider you have [Pi-hole](https://github.com/pi-hole/pi-hole) set up in your home, and now you want to use it instead of your Private DNS provider. However, at the same time, you want to enable your Private DNS outside your home network. Well, this is what this app is for.
+Let's consider you want to have [Pi-hole](https://github.com/pi-hole/pi-hole) set up in your home and a secure Private DNS provider outside your home network, all of this automated. Well, this is what this app is for.
+
+Let's consider a scenario where you have Pi-hole set up in your home, and you want to use it instead of your Private DNS provider while connected to your local network. However, at the same time, you want to enable your Private DNS when outside your home network. Well, this is what this app is for, it automates the switch between them.
 
 Since Android does not natively allow you to disable "Private DNS" for specific Wi-Fi networks while keeping it enabled for mobile data, this app solves that problem by running a background service that detects your connection state.
 
