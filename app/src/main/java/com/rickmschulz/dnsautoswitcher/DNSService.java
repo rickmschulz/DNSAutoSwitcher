@@ -124,7 +124,7 @@ public class DNSService extends Service {
         getSystemService(NotificationManager.class).createNotificationChannel(channel);
 
         Notification notification = new Notification.Builder(this, channelId)
-                .setContentTitle("Privacy Pilot")
+                .setContentTitle("DNSAutoSwitcher")
                 .setContentText("Monitoring Network...")
                 .setSmallIcon(android.R.drawable.ic_menu_compass)
                 .build();
