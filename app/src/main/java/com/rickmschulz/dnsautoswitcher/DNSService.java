@@ -50,20 +50,16 @@ public class DNSService extends Service {
     private void startMonitoring() {
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        // 1. SETUP THE LISTENER (For future changes)
         networkCallback = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(Network network) {
                 super.onAvailable(network);
-                Log.d("DNSAuto", "Network Available: " + network);
                 checkNetworkAndSwitchDNS(network);
             }
 
             @Override
             public void onLost(Network network) {
                 super.onLost(network);
-                Log.d("DNSAuto", "Network Lost");
-                // If we lost Wi-Fi, assume we are "Away"
                 setPrivateDNS(true);
             }
 
@@ -78,27 +74,23 @@ public class DNSService extends Service {
                 .build();
         connectivityManager.registerNetworkCallback(request, networkCallback);
 
-        // 2. PERFORM INITIAL CHECK (For right now)
-        // We manually check the current state so we don't have to wait for a callback event.
+        // Initial Check
         Network activeNetwork = connectivityManager.getActiveNetwork();
         if (activeNetwork != null) {
             NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(activeNetwork);
             if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                // We are already on Wi-Fi -> Check it and likely Turn OFF
                 checkNetworkAndSwitchDNS(activeNetwork);
             } else {
-                // We are on Mobile Data or nothing -> Turn ON
                 setPrivateDNS(true);
             }
         } else {
-            // No network at all -> Default to Secure (Turn ON)
             setPrivateDNS(true);
         }
     }
 
     private void checkNetworkAndSwitchDNS(Network network) {
-        // In this simple version, any Wi-Fi connection triggers "Home Mode" (DNS Off).
-        // This runs immediately on start if Wi-Fi is connected.
+        // In a full version, you would check SSID here.
+        // For now, we assume any Wi-Fi is Home.
         setPrivateDNS(false);
     }
 
@@ -106,30 +98,23 @@ public class DNSService extends Service {
         String hostname = prefs.getString("privatedns_id", "");
 
         if (enable && hostname.isEmpty()) {
-            Log.e("DNSAuto", "PrivateDNS ID not set! Cannot switch.");
             return;
         }
 
         try {
-            // Check current state to avoid redundant writes (optional optimization)
             String currentMode = Settings.Global.getString(getContentResolver(), "private_dns_mode");
             String targetMode = enable ? "hostname" : "off";
 
-            // Only write if the state is actually different
             if (!targetMode.equals(currentMode)) {
                 if (enable) {
-                    // AWAY MODE: Enable Private DNS
                     Settings.Global.putString(getContentResolver(), "private_dns_mode", "hostname");
                     Settings.Global.putString(getContentResolver(), "private_dns_specifier", hostname);
-                    Log.d("DNSAuto", "Switched to Private DNS: " + hostname);
                 } else {
-                    // HOME MODE: Disable Private DNS
                     Settings.Global.putString(getContentResolver(), "private_dns_mode", "off");
-                    Log.d("DNSAuto", "Switched to Local DNS (Off)");
                 }
             }
         } catch (SecurityException e) {
-            Log.e("DNSAuto", "Permission Denied! Run the ADB command.", e);
+            Log.e("DNSAuto", "Permission Denied!", e);
         }
     }
 
@@ -144,8 +129,9 @@ public class DNSService extends Service {
                 .setSmallIcon(android.R.drawable.ic_menu_compass)
                 .build();
 
+        // UPDATED: Use SPECIAL_USE type to prevent crashes on Android 14+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            startForeground(1, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+            startForeground(1, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
         } else {
             startForeground(1, notification);
         }
