@@ -1,0 +1,9 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Shield -->
+    <path d="M256 48C150 48 64 134 64 240C64 346 150 432 256 432C362 432 448 346 448 240C448 134 362 48 256 48Z" fill="#1A73E8"/>
+    <path d="M256 80C256 80 100 120 100 256C100 380 256 480 256 480C256 480 412 380 412 256C412 120 256 80 256 80Z" fill="#4285F4"/>
+    
+    <!-- The "Navigator" (Compass Needle) -->
+    <path d="M256 130L310 256L256 382L202 256L256 130Z" fill="#E8F0FE"/>
+    <path d="M256 130L310 256H202L256 130Z" fill="white"/>
+</svg>
