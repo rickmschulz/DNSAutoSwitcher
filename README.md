@@ -49,6 +49,12 @@ Grant Location permission and select `Allow all the time`.
 - **BootReceiver.java:** Automatically restarts the monitoring service when the phone reboots.
 - **Permissions:** Uses `WRITE_SECURE_SETTINGS` to modify `Settings.Global.private_dns_mode`.
 
+## Changelog
+
+**v1.1**
+* **Fixed:** The app was only partially working as intended. This release fixes the underlying issues and restores full functionality.
+* *Note: This version is undergoing active testing over the next few days to ensure long-term stability.*
+
 ## Note
 
 This app targets Android 9.0 (Pie) and higher, as the Private DNS feature was introduced in API 28.
