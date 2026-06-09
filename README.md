@@ -32,9 +32,13 @@ adb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECU
 
 To ensure the app works reliably in the background, open the app's settings page and:
 
-Disable `Manage app if unused`.
-Set Battery usage to `Unrestricted`.
-Grant Location permission and select `Allow all the time`.
+- Disable `Manage app if unused`.
+- Set Battery usage to `Unrestricted`.
+- Grant Location permission and select `Allow all the time`.
+
+#### Why Does the App Need Location Permission? 
+
+Google requires any app that reads the connected Wi-Fi network's SSID or BSSID to have either `ACCESS_COARSE_LOCATION` or `ACCESS_FINE_LOCATION` permission. Without this permission, Android will return `<unknown ssid>` instead of the actual network name. Since DNS Auto Switcher identifies your home network by its SSID, location permission is required for the app to detect when you're connected to your Wi-Fi and automatically toggle Private DNS settings.
 
 ### 3. Configure
 
