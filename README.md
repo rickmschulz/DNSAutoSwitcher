@@ -15,7 +15,7 @@ Since Android does not natively allow you to disable "Private DNS" for specific 
 
 ### 1. Install the App
 
-Build the APK using [Android Studio](https://developer.android.com/studio) and install it on your device.
+Build the APK using [Android Studio](https://developer.android.com/studio) or download the release and install it on your device.
 
 ### 2. Grant Permissions (Crucial)
 
