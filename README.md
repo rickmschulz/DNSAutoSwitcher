@@ -30,6 +30,12 @@ adb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECU
 > [!TIP]
 > If you need help with ADB, this [page](https://developer.android.com/tools/adb) can help you.
 
+To ensure the app works reliably in the background, open the app's settings page and:
+
+Disable `Manage app if unused`.
+Set Battery usage to `Unrestricted`.
+Grant Location permission and select `Allow all the time`.
+
 ### 3. Configure
 
 1. Open the app.

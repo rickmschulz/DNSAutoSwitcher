@@ -50,31 +50,62 @@ public class DNSService extends Service {
     private void startMonitoring() {
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        networkCallback = new ConnectivityManager.NetworkCallback() {
-            @Override
-            public void onAvailable(Network network) {
-                super.onAvailable(network);
-                checkNetworkAndSwitchDNS(network);
-            }
+        // Android 12+ requires a specific flag to expose the SSID in the callback
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            networkCallback = new ConnectivityManager.NetworkCallback(ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO) {
+                @Override
+                public void onAvailable(Network network) {
+                    // Fires instantly when connected, but SSID is often not fully loaded yet.
+                    checkNetworkAndSwitchDNS(network);
+                }
 
-            @Override
-            public void onLost(Network network) {
-                super.onLost(network);
-                setPrivateDNS(true);
-            }
+                @Override
+                public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
+                    // Fires milliseconds later when Android has successfully attached the SSID to the network info.
+                    checkNetworkAndSwitchDNS(network);
+                }
 
-            @Override
-            public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
-                checkNetworkAndSwitchDNS(network);
-            }
-        };
+                @Override
+                public void onLost(Network network) {
+                    setPrivateDNS(true);
+                }
+
+                @Override
+                public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
+                    checkNetworkAndSwitchDNS(network);
+                }
+            };
+        } else {
+            // Fallback for older Android versions
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    checkNetworkAndSwitchDNS(network);
+                }
+
+                @Override
+                public void onCapabilitiesChanged(Network network, NetworkCapabilities networkCapabilities) {
+                    checkNetworkAndSwitchDNS(network);
+                }
+
+                @Override
+                public void onLost(Network network) {
+                    setPrivateDNS(true);
+                }
+
+                @Override
+                public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
+                    checkNetworkAndSwitchDNS(network);
+                }
+            };
+        }
 
         NetworkRequest request = new NetworkRequest.Builder()
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
                 .build();
         connectivityManager.registerNetworkCallback(request, networkCallback);
 
-        // Initial Check
+        // Initial Check (for when the service is manually started)
         Network activeNetwork = connectivityManager.getActiveNetwork();
         if (activeNetwork != null) {
             NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(activeNetwork);
@@ -89,9 +120,47 @@ public class DNSService extends Service {
     }
 
     private void checkNetworkAndSwitchDNS(Network network) {
-        // In a full version, you would check SSID here.
-        // For now, we assume any Wi-Fi is Home.
-        setPrivateDNS(false);
+        NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(network);
+
+        // Ignore if the network is not Wi-Fi
+        if (caps == null || !caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            return;
+        }
+
+        String currentSsid = null;
+
+        // Attempt to extract SSID via TransportInfo (Android 10+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            android.net.TransportInfo transportInfo = caps.getTransportInfo();
+            if (transportInfo instanceof android.net.wifi.WifiInfo) {
+                currentSsid = ((android.net.wifi.WifiInfo) transportInfo).getSSID();
+            }
+        }
+
+        // Fallback to WifiManager for older versions or masked SSIDs
+        if (currentSsid == null || currentSsid.equals("<unknown ssid>")) {
+            android.net.wifi.WifiManager wifiManager = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (wifiManager != null) {
+                android.net.wifi.WifiInfo info = wifiManager.getConnectionInfo();
+                if (info != null) {
+                    currentSsid = info.getSSID();
+                }
+            }
+        }
+
+        if (currentSsid != null) {
+            currentSsid = currentSsid.replace("\"", "");
+        }
+        
+        // Retrieve the home network name saved from MainActivity
+        String targetSsid = prefs.getString("home_ssid", "");
+
+        // Execute DNS switch logic based on SSID match
+        if (currentSsid != null && currentSsid.equals(targetSsid)) {
+            setPrivateDNS(false); // Match found
+        } else {
+            setPrivateDNS(true);  // No match
+        }
     }
 
     private void setPrivateDNS(boolean enable) {

@@ -28,13 +28,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Request Notification Permission (Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
-            }
-        }
-
         inputSSID = findViewById(R.id.input_ssid);
         inputDNS = findViewById(R.id.input_dns_id);
         btnAction = findViewById(R.id.btn_save);
@@ -43,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         inputSSID.setText(prefs.getString("home_ssid", ""));
         inputDNS.setText(prefs.getString("privatedns_id", ""));
 
-        // Perform initial check
+        requestRequiredPermissions();
         syncServiceState();
         updateUI();
 
@@ -56,18 +49,43 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void requestRequiredPermissions() {
+        // Step 1: Request Notifications (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 102);
+            }
+        }
+
+        // Step 2: Request Foreground Location
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, 101);
+        } else {
+            // Step 3: Request Background Location (Android 10+)
+            // This is ONLY triggered if Foreground Location is already granted
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "CRITICAL: You must select 'Allow all the time' for the background service to read the Wi-Fi name.", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 103);
+                }
+            }
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        // "Reality Check": Every time the screen appears, check if the service is actually alive
         syncServiceState();
         updateUI();
+
+        // Re-check permissions when returning to the app to trigger the background request
+        // if the foreground request was just granted.
+        requestRequiredPermissions();
     }
 
-    /**
-     * Checks if the service is actually running in the Android System
-     * and updates the static flag to match reality.
-     */
     private void syncServiceState() {
         boolean actuallyRunning = false;
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -101,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
             startService(serviceIntent);
         }
 
-        // Assume start was successful for immediate UI feedback
         DNSService.isRunning = true;
         updateUI();
         Toast.makeText(this, "Service Started!", Toast.LENGTH_SHORT).show();
@@ -111,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent = new Intent(this, DNSService.class);
         stopService(serviceIntent);
 
-        // Update flag immediately
         DNSService.isRunning = false;
         updateUI();
         Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show();
