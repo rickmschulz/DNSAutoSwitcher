@@ -17,7 +17,7 @@ You can configure more than one network: home, an office, a studio, a regular ho
 
 ### 1. Install the App
 
-Build the APK using [Android Studio](https://developer.android.com/studio) or download the release and install it on your device.
+Build the APK using [Android Studio](https://developer.android.com/studio) or download the [release](https://github.com/rickmschulz/DNSAutoSwitcher/releases/latest/) and install it on your device.
 
 ### 2. Grant Permissions (Crucial)
 
