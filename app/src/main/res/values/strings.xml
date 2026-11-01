@@ -2,24 +2,33 @@
     <string name="app_name">DNSAutoSwitcher</string>
     <string name="version_label">Version %1$s (%2$d)</string>
 
-    <string name="hint_home_ssid">Wi-Fi name to treat as local (SSID)</string>
+    <string name="hint_networks">Wi-Fi name (SSID)</string>
     <string name="hint_private_dns">Private DNS hostname (e.g. 12345.dns.nextdns.io)</string>
 
     <string name="action_start">Save &amp; Start Service</string>
     <string name="action_stop">Stop Service</string>
     <string name="action_restart">Restart Service</string>
     <string name="action_settings">Settings</string>
+    <string name="action_add">Add network</string>
+    <string name="action_use_current">Use current</string>
+    <string name="action_remove">Remove</string>
+
+    <string name="toast_network_added">Network added</string>
+    <string name="toast_network_duplicate">That network is already in the list</string>
+    <string name="toast_network_required">Add at least one Wi-Fi name</string>
+    <string name="toast_cannot_read_network">Cannot read the current Wi-Fi name. Connect to it, or type it below.</string>
+    <string name="networks_empty">No networks yet. Add the Wi-Fi name or names where Private DNS should be off.</string>
 
     <string name="settings_title">Settings</string>
     <string name="settings_notification_title">Show a persistent notification</string>
     <string name="settings_notification_summary">Off by default. Android protects a service that shows a notification far better than one that does not, so turning this on makes switching happen straight away instead of waiting for the periodic check. The cost is a permanent entry in the notification shade.</string>
-    <string name="settings_notification_state_on">Notification shown — the service is kept in the foreground.</string>
-    <string name="settings_notification_state_off">No notification — the service may be stopped when the phone is idle, and switching falls back to the periodic check.</string>
+    <string name="settings_notification_state_on">Notification shown: the service is kept in the foreground.</string>
+    <string name="settings_notification_state_off">No notification: the service may be stopped when the phone is idle, and switching falls back to the periodic check.</string>
 
-    <string name="status_running">Service running — Private DNS follows your Wi-Fi network.</string>
+    <string name="status_running">Service running: Private DNS follows your Wi-Fi network.</string>
     <string name="status_stopped">Service stopped.</string>
-    <string name="status_stale">The service is not updating. Android may have stopped it — press Restart.</string>
-    <string name="status_missing_permission">Missing permission — follow the steps below.</string>
+    <string name="status_stale">The service is not updating. Android may have stopped it: press Restart.</string>
+    <string name="status_missing_permission">Missing permission: follow the steps below.</string>
     <string name="status_missing_wifi_permission">Missing permission to read the Wi-Fi network name. Grant location, or nearby devices on Android 13+.</string>
     <string name="status_background_redacted">Location is set to "Only while using the app", so the Wi-Fi name is hidden from the service when this screen is closed. Set Location to "Allow all the time".</string>
     <string name="status_background_blocked">The phone still hides the Wi-Fi name from this app. Some Android builds cannot be worked around.</string>
@@ -32,22 +41,23 @@
 
     <string name="permission_help">IMPORTANT\nGrant the ADB permission once:\n\nadb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECURE_SETTINGS\n\nXiaomi, Redmi and POCO (MIUI / HyperOS): the command is rejected unless you also enable Developer options → “USB debugging (Security settings)”.</string>
 
-    <string name="toast_fill_both_fields">Please fill in both fields</string>
+    <string name="toast_fill_both_fields">Enter your Private DNS hostname</string>
     <string name="toast_started">Service started</string>
     <string name="toast_stopped">Service stopped</string>
     <string name="toast_restarted">Service restarted</string>
-    <string name="toast_location_fallback">The app cannot read your Wi-Fi name. Some phones need Location access for that — allow it so the switch can work.</string>
+    <string name="toast_location_fallback">The app cannot read your Wi-Fi name. Some phones need Location access for that: allow it so the switch can work.</string>
     <string name="toast_background_location">CRITICAL: choose \'Allow all the time\' so the background service can read the Wi-Fi name.</string>
 
     <string name="notification_channel_name">Private DNS switching</string>
     <string name="notification_channel_description">Shows which state Private DNS is in.</string>
-    <string name="notification_local">%1$s — local DNS in use, Private DNS off</string>
-    <string name="notification_local_generic">On your configured network — local DNS in use, Private DNS off</string>
-    <string name="notification_remote">Private DNS on — not on %1$s</string>
-    <string name="notification_remote_generic">Private DNS on — not on your configured network</string>
-    <string name="notification_missing_permission">Missing WRITE_SECURE_SETTINGS — see the app</string>
-    <string name="notification_monitoring_failed">Cannot monitor the network — restart the app</string>
-    <string name="notification_unreadable_ssid">Cannot read the Wi-Fi name — check the permissions</string>
+    <string name="notification_local">%1$s: local DNS in use, Private DNS off</string>
+    <string name="notification_local_generic">On your configured network: local DNS in use, Private DNS off</string>
+    <string name="notification_remote">Private DNS on: not on %1$s</string>
+    <string name="notification_remote_multiple">Private DNS on: not on any of your %1$d networks</string>
+    <string name="notification_remote_generic">Private DNS on: not on your configured network</string>
+    <string name="notification_missing_permission">Missing WRITE_SECURE_SETTINGS: see the app</string>
+    <string name="notification_monitoring_failed">Cannot monitor the network: restart the app</string>
+    <string name="notification_unreadable_ssid">Cannot read the Wi-Fi name: check the permissions</string>
 
     <string name="observed_with_age">%1$s · checked %2$s</string>
     <string name="age_just_now">just now</string>
@@ -55,6 +65,6 @@
     <string name="age_hours">%1$d h ago</string>
     <string name="observed_ssid">Wi-Fi seen: %1$s</string>
     <string name="observed_none">Wi-Fi seen: none (mobile data)</string>
-    <string name="observed_unreadable">Wi-Fi seen: unreadable — grant Location (or Nearby devices) access</string>
+    <string name="observed_unreadable">Wi-Fi seen: unreadable: grant Location (or Nearby devices) access</string>
     <string name="notification_action_stop">Stop</string>
 </resources>

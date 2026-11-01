@@ -12,6 +12,12 @@ import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -26,7 +32,10 @@ final class Reconciler {
     static final String TAG = "DNSService";
 
     static final String PREFS = "DNSAutoSwitcherPrefs";
+    /** Legacy single-network key. Read once and migrated into {@link #KEY_NETWORKS}. */
     static final String KEY_HOME_SSID = "home_ssid";
+    /** The configured networks, as a JSON array of SSID strings. */
+    static final String KEY_NETWORKS = "configured_networks";
     static final String KEY_PRIVATE_DNS = "privatedns_id";
     static final String KEY_ENABLED = "service_enabled";
     static final String KEY_ALIVE = "service_alive";
@@ -50,6 +59,60 @@ final class Reconciler {
 
     static SharedPreferences prefs(Context context) {
         return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    }
+
+    /**
+     * Every network that should be treated as local. Empty when nothing is configured.
+     *
+     * The single-network setting of earlier versions is migrated on first read, so an existing
+     * install keeps working without touching anything.
+     */
+    static List<String> configuredNetworks(Context context) {
+        SharedPreferences prefs = prefs(context);
+        String stored = prefs.getString(KEY_NETWORKS, null);
+
+        if (stored == null) {
+            String legacy = prefs.getString(KEY_HOME_SSID, "");
+            List<String> migrated = new ArrayList<>();
+            if (legacy != null && !legacy.trim().isEmpty()) {
+                migrated.add(legacy.trim());
+                saveNetworks(context, migrated);
+                Log.i(TAG, "migrated the single network setting to the list");
+            }
+            return migrated;
+        }
+
+        return parseNetworks(stored);
+    }
+
+    static void saveNetworks(Context context, List<String> networks) {
+        JSONArray array = new JSONArray();
+        for (String network : networks) {
+            if (network != null && !network.trim().isEmpty()) {
+                array.put(network.trim());
+            }
+        }
+        prefs(context).edit()
+                .putString(KEY_NETWORKS, array.toString())
+                // Kept in step so an older build of the app, or a downgrade, still sees something.
+                .putString(KEY_HOME_SSID, array.length() > 0 ? array.optString(0, "") : "")
+                .apply();
+    }
+
+    private static List<String> parseNetworks(String json) {
+        List<String> networks = new ArrayList<>();
+        try {
+            JSONArray array = new JSONArray(json);
+            for (int i = 0; i < array.length(); i++) {
+                String network = array.optString(i, "").trim();
+                if (!network.isEmpty() && !networks.contains(network)) {
+                    networks.add(network);
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "Could not read the configured networks", e);
+        }
+        return networks.isEmpty() ? Collections.emptyList() : networks;
     }
 
     /**
@@ -147,12 +210,12 @@ final class Reconciler {
         SharedPreferences prefs = prefs(context);
         Observation seen = observe(context);
 
-        String homeSsid = prefs.getString(KEY_HOME_SSID, "");
-        SwitchPolicy.State state = SwitchPolicy.decide(homeSsid,
+        List<String> networks = configuredNetworks(context);
+        SwitchPolicy.State state = SwitchPolicy.decide(networks,
                 prefs.getString(KEY_PRIVATE_DNS, ""), seen.onWifi, seen.ssid);
 
         Log.i(TAG, "onWifi=" + seen.onWifi + " ssid=" + seen.ssid
-                + " home=" + homeSsid + " -> " + state);
+                + " configured=" + networks + " -> " + state);
 
         prefs.edit()
                 .putString(KEY_LAST_SSID, seen.ssid == null ? "" : seen.ssid)

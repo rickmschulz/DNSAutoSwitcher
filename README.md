@@ -8,10 +8,10 @@ Let's consider a scenario where you have [Pi-hole](https://github.com/pi-hole/pi
 
 Since Android does not natively allow you to disable "Private DNS" for specific Wi-Fi networks while keeping it enabled for mobile data, this app solves that problem by running a background service that detects your connection state.
 
-- **On your configured network:** Disables Private DNS, so your local resolver answers.
+- **On your configured networks:** Disables Private DNS, so your local resolver answers.
 - **On any other network:** Enables Private DNS (NextDNS, AdGuard and others), so filtering still applies away from it.
 
-The network you configure does not have to be a home network. It is simply the Wi-Fi name where you want your own resolver used.
+You can configure more than one network: home, an office, a studio, a regular hotspot. Any of them counts as local. They do not have to belong to the same place, and the app only compares Wi-Fi names, so two networks with the same name are indistinguishable to it.
 
 ## Setup & Installation
 
@@ -71,9 +71,11 @@ Android 11 and later do not let an app request that mode with a dialog. It has t
 ### 3. Configure
 
 1. Open the app.
-2. Enter the **Wi-Fi name to treat as local** (e.g., `MyHomeWiFi` or your office SSID).
+2. Type a **Wi-Fi name** and press **Add network**. Repeat for every network that should use your local resolver, for example `MyHomeWiFi` and your office SSID. **Use current** fills in the network the phone is on right now.
 3. Enter your **Private DNS Hostname** (e.g., `12345.dns.nextdns.io` or `dns.adguard-dns.com`).
 4. Click **Save & Start Service**.
+
+The network list can be edited while the app is running. Adding or removing a network takes effect straight away.
 
 The **Settings** screen holds one option: whether the app shows a persistent notification while it monitors. It is off by default. See [Reliability](#reliability) for what that choice costs.
 
@@ -105,7 +107,7 @@ If step 2 or 3 fails while everything else passes, read the status line in the a
 
 ## Architecture
 
-- **SwitchPolicy.java:** The decisions, as pure functions with no Android dependency: is this the configured network, which Private DNS mode does that imply, and does anything need writing. Unit tested on the host.
+- **SwitchPolicy.java:** The decisions, as pure functions with no Android dependency: is this one of the configured networks, which Private DNS mode does that imply, and does anything need writing. Unit tested on the host.
 - **Reconciler.java:** Reads the current network, asks the policy, and writes `Settings.Global.private_dns_mode` and `private_dns_specifier`. Static, so both the service and the periodic job can use it.
 - **DNSService.java:** The fast path. Listens for network changes with `ConnectivityManager.NetworkCallback`, debounces the burst that arrives on every connect, and re-evaluates. Runs in the foreground with a notification, or as an ordinary service if the notification is switched off.
 - **WatchdogJobService.java:** The slow path. A persisted job that applies the same decision every 15 minutes, so a killed service does not mean a wrong setting.
@@ -130,6 +132,11 @@ git push origin v1.2
 Skipping this is what made v1.1 report itself as 1.0, and made updaters such as Obtainium keep offering a release that was already installed.
 
 ## Changelog
+
+**Unreleased**
+* **Added:** any number of Wi-Fi networks can be configured, and all of them count as local. The single network of earlier versions is migrated automatically.
+* **Added:** "Use current" adds the network the phone is connected to.
+* **Changed:** the notification says how many networks are configured instead of naming a single one.
 
 **v1.2**
 * **Fixed:** the version now comes from the git tag instead of being edited by hand, and is shown inside the app.

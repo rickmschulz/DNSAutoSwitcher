@@ -486,13 +486,16 @@ public class DNSService extends Service {
                 .equals(prefs.getString(KEY_LAST_STATE, ""))) {
             return getString(R.string.notification_unreadable_ssid);
         }
-        String configured = prefs.getString(KEY_HOME_SSID, "");
+        java.util.List<String> configured = Reconciler.configuredNetworks(this);
         String seen = prefs.getString(KEY_LAST_SSID, "");
 
         if (MODE_HOSTNAME.equals(Reconciler.currentMode(this))) {
+            if (configured.size() == 1) {
+                return getString(R.string.notification_remote, configured.get(0));
+            }
             return configured.isEmpty()
                     ? getString(R.string.notification_remote_generic)
-                    : getString(R.string.notification_remote, configured);
+                    : getString(R.string.notification_remote_multiple, configured.size());
         }
         return seen.isEmpty()
                 ? getString(R.string.notification_local_generic)
