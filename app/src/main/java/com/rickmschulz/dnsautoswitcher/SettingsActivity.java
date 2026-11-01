@@ -22,6 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        SystemBars.pad(findViewById(R.id.settings_root));
 
         MaterialSwitch notificationSwitch = findViewById(R.id.switch_notification);
         TextView state = findViewById(R.id.text_notification_state);
