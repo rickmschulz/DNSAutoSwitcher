@@ -8,6 +8,9 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,11 +30,29 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_WIFI = 102;
     private static final int REQUEST_BACKGROUND_LOCATION = 103;
 
+    /**
+     * The ADB permission is granted from outside the app, so the screen has to notice it on its
+     * own. Polling runs only while the permission is missing and the screen is visible.
+     */
+    private static final long PERMISSION_POLL_MS = 2000L;
+
     private TextInputEditText inputSSID;
     private TextInputEditText inputDNS;
     private Button btnAction;
     private TextView textStatus;
+    private TextView textHelp;
     private SharedPreferences prefs;
+
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final Runnable permissionPoll = new Runnable() {
+        @Override
+        public void run() {
+            updateUI();
+            if (!DNSService.hasPermission(MainActivity.this)) {
+                uiHandler.postDelayed(this, PERMISSION_POLL_MS);
+            }
+        }
+    };
 
     /** Asking for background location repeatedly on every resume is pure nagging. */
     private boolean backgroundLocationAsked;
@@ -45,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         inputDNS = findViewById(R.id.input_dns_id);
         btnAction = findViewById(R.id.btn_save);
         textStatus = findViewById(R.id.text_status);
+        textHelp = findViewById(R.id.text_help);
 
         TextView textVersion = findViewById(R.id.text_version);
         textVersion.setText(getString(R.string.version_label, getVersionName(), getVersionCodeLong()));
@@ -67,6 +89,15 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         requestRequiredPermissions();
         updateUI();
+
+        uiHandler.removeCallbacks(permissionPoll);
+        uiHandler.postDelayed(permissionPoll, PERMISSION_POLL_MS);
+    }
+
+    @Override
+    protected void onPause() {
+        uiHandler.removeCallbacks(permissionPoll);
+        super.onPause();
     }
 
     @Override
@@ -199,6 +230,10 @@ public class MainActivity extends AppCompatActivity {
         btnAction.setEnabled(canWrite);
         inputSSID.setEnabled(!active);
         inputDNS.setEnabled(!active);
+
+        // The instructions exist only to get the permission granted, so they disappear the moment
+        // it is - and the status line never repeats what that block already says.
+        textHelp.setVisibility(canWrite ? View.GONE : View.VISIBLE);
 
         if (!canWrite) {
             textStatus.setText(R.string.status_missing_permission);

@@ -10,7 +10,7 @@
 
     <string name="status_running">Service running — Private DNS follows your Wi-Fi network.</string>
     <string name="status_stopped">Service stopped.</string>
-    <string name="status_missing_permission">Missing permission. Connect the phone and run:\n\nadb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="status_missing_permission">Missing permission — follow the steps below.</string>
     <string name="status_missing_wifi_permission">Missing permission to read the Wi-Fi network name. Grant location, or nearby devices on Android 13+.</string>
 
     <string name="permission_help">IMPORTANT\nGrant the ADB permission once:\n\nadb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECURE_SETTINGS\n\nXiaomi, Redmi and POCO (MIUI / HyperOS): the command is rejected unless you also enable Developer options → “USB debugging (Security settings)”.</string>
