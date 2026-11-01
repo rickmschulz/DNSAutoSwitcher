@@ -61,8 +61,8 @@ public class DNSService extends Service {
     private static final int NOTIFICATION_ID = 1;
 
     /** Private DNS modes as stored in Settings.Global.private_dns_mode. */
-    private static final String MODE_OFF = "off";
-    private static final String MODE_HOSTNAME = "hostname";
+    private static final String MODE_OFF = SwitchPolicy.MODE_OFF;
+    private static final String MODE_HOSTNAME = SwitchPolicy.MODE_HOSTNAME;
 
     private static final String SETTING_MODE = "private_dns_mode";
     private static final String SETTING_SPECIFIER = "private_dns_specifier";
@@ -164,8 +164,9 @@ public class DNSService extends Service {
 
         // Never leave the device with Private DNS disabled: if we were the one that turned it off,
         // put the configured provider back before going away.
-        if (MODE_OFF.equals(prefs.getString(KEY_LAST_APPLIED, ""))) {
-            applyPrivateDns(true);
+        if (SwitchPolicy.shouldRestoreOnStop(prefs.getString(KEY_LAST_APPLIED, ""),
+                prefs.getString(KEY_PRIVATE_DNS, ""))) {
+            applyPrivateDns(MODE_HOSTNAME);
         }
 
         markAlive(false);
@@ -189,42 +190,21 @@ public class DNSService extends Service {
     }
 
     private void reconcile() {
-        Boolean away = decideAway();
-        if (away == null) {
+        Network wifi = findWifiNetwork();
+        String ssid = wifi == null ? null : currentSsid(wifi);
+
+        String desired = SwitchPolicy.desiredMode(SwitchPolicy.decide(
+                prefs.getString(KEY_HOME_SSID, ""),
+                prefs.getString(KEY_PRIVATE_DNS, ""),
+                wifi != null,
+                ssid));
+
+        if (desired == null) {
             // Not enough information (no Wi-Fi yet, SSID unreadable, nothing configured):
             // leave the current setting alone rather than guess and disable filtering.
             return;
         }
-        applyPrivateDns(away);
-    }
-
-    /**
-     * @return true when Private DNS should be enabled, false when it should be off,
-     *         null when there is not enough information to decide.
-     */
-    @Nullable
-    private Boolean decideAway() {
-        String hostname = prefs.getString(KEY_PRIVATE_DNS, "");
-        if (hostname.isEmpty()) {
-            return null;
-        }
-
-        Network wifi = findWifiNetwork();
-        if (wifi == null) {
-            return Boolean.TRUE;
-        }
-
-        String homeSsid = prefs.getString(KEY_HOME_SSID, "");
-        if (homeSsid.isEmpty()) {
-            return Boolean.TRUE;
-        }
-
-        String ssid = currentSsid(wifi);
-        if (ssid == null) {
-            return null;
-        }
-
-        return !homeSsid.equals(ssid);
+        applyPrivateDns(desired);
     }
 
     @Nullable
@@ -247,7 +227,7 @@ public class DNSService extends Service {
             NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(network);
             if (caps != null) {
                 WifiInfo info = (WifiInfo) caps.getTransportInfo();
-                String ssid = normalizeSsid(info == null ? null : info.getSSID());
+                String ssid = SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
                 if (ssid != null) {
                     return ssid;
                 }
@@ -258,7 +238,7 @@ public class DNSService extends Service {
             WifiManager wifiManager =
                     (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (wifiManager != null) {
-                return normalizeSsid(wifiManager.getConnectionInfo().getSSID());
+                return SwitchPolicy.normalizeSsid(wifiManager.getConnectionInfo().getSSID());
             }
         } catch (SecurityException e) {
             Log.w(TAG, "Cannot read the SSID without the location / nearby Wi-Fi permission", e);
@@ -266,41 +246,25 @@ public class DNSService extends Service {
         return null;
     }
 
-    @Nullable
-    private static String normalizeSsid(@Nullable String raw) {
-        if (raw == null) {
-            return null;
-        }
-        String ssid = raw.trim();
-        if (ssid.length() >= 2 && ssid.startsWith("\"") && ssid.endsWith("\"")) {
-            ssid = ssid.substring(1, ssid.length() - 1);
-        }
-        if (ssid.isEmpty() || "<unknown ssid>".equals(ssid)) {
-            return null;
-        }
-        return ssid;
-    }
-
-    private void applyPrivateDns(boolean enable) {
+    private void applyPrivateDns(String desired) {
         String hostname = prefs.getString(KEY_PRIVATE_DNS, "");
-        String desired = enable ? MODE_HOSTNAME : MODE_OFF;
 
         try {
-            if (enable) {
+            if (MODE_HOSTNAME.equals(desired)) {
                 if (hostname.isEmpty()) {
                     return;
                 }
                 // Written independently of the mode: editing the hostname while already in
                 // "hostname" mode used to leave the old provider in place until the next switch.
                 String specifier = Settings.Global.getString(getContentResolver(), SETTING_SPECIFIER);
-                if (!hostname.equals(specifier)) {
+                if (SwitchPolicy.providerNeedsWrite(specifier, hostname)) {
                     Settings.Global.putString(getContentResolver(), SETTING_SPECIFIER, hostname);
                     Log.i(TAG, "Private DNS provider set to " + hostname);
                 }
             }
 
             String current = currentMode();
-            if (!desired.equals(current)) {
+            if (SwitchPolicy.modeNeedsWrite(current, desired)) {
                 Settings.Global.putString(getContentResolver(), SETTING_MODE, desired);
                 Log.i(TAG, "Private DNS mode " + current + " -> " + desired);
             }
