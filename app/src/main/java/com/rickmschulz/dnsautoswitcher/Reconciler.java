@@ -57,6 +57,32 @@ final class Reconciler {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Whether the Wi-Fi name can be read at all. Android 13+ normally asks only for
+     * NEARBY_WIFI_DEVICES, but several OEM builds - MIUI and HyperOS among them - still redact the
+     * name without location, so either permission counts.
+     */
+    static boolean canReadWifiName(Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
+                && context.checkSelfPermission("android.permission.NEARBY_WIFI_DEVICES")
+                == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        return context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /** Which of the Wi-Fi permissions are held, so a change in either one is noticed. */
+    static String wifiPermissionFingerprint(Context context) {
+        return (granted(context, Manifest.permission.NEARBY_WIFI_DEVICES) ? "1" : "0")
+                + (granted(context, Manifest.permission.ACCESS_FINE_LOCATION) ? "1" : "0")
+                + (granted(context, Manifest.permission.ACCESS_COARSE_LOCATION) ? "1" : "0");
+    }
+
+    private static boolean granted(Context context, String permission) {
+        return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
     static final class Observation {
         final boolean onWifi;
         final String ssid;

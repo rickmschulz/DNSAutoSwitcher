@@ -48,6 +48,8 @@ public class DNSService extends Service {
     static final String KEY_LAST_CHECK = Reconciler.KEY_LAST_CHECK;
 
     static final String ACTION_STOP = "com.rickmschulz.dnsautoswitcher.action.STOP";
+    /** Re-read the network from scratch, e.g. after a permission that was missing is granted. */
+    static final String ACTION_REFRESH = "com.rickmschulz.dnsautoswitcher.action.REFRESH";
 
     private static final String CHANNEL_ID = "dns_autoswitcher";
     private static final int NOTIFICATION_ID = 1;
@@ -78,6 +80,8 @@ public class DNSService extends Service {
     private Runnable reconcileTask;
     /** Set when no network subscription could be established at all. */
     private boolean monitoringFailed;
+    /** Which Wi-Fi permissions the callbacks were registered with. */
+    private String registeredPermissions = "";
 
     private final Runnable safetyNet = new Runnable() {
         @Override
@@ -85,6 +89,7 @@ public class DNSService extends Service {
             Log.d(TAG, "safety check");
             if (worker != null) {
                 worker.postDelayed(this, SAFETY_NET_MS);
+                worker.post(DNSService.this::refreshRegistration);
             }
             scheduleReconcile();
         }
@@ -92,6 +97,10 @@ public class DNSService extends Service {
 
     static boolean hasPermission(android.content.Context context) {
         return Reconciler.hasPermission(context);
+    }
+
+    static boolean canReadWifiName(android.content.Context context) {
+        return Reconciler.canReadWifiName(context);
     }
 
     @Override
@@ -110,46 +119,7 @@ public class DNSService extends Service {
         worker = new Handler(workerThread.getLooper());
         reconcileTask = this::reconcile;
 
-        NetworkRequest request = new NetworkRequest.Builder()
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .build();
-
-        // FLAG_INCLUDE_LOCATION_INFO is what makes the SSID readable from the callback's
-        // NetworkCapabilities on Android 12 and newer. Without it getSSID() reports
-        // "<unknown ssid>" even with every permission granted, and the switch never happens.
-        // The int constructor only exists from API 31, and a few builds refuse the flagged
-        // subscription outright, so fall back to the plain one instead of monitoring nothing.
-        networkCallback = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                ? locationCallback()
-                : plainCallback();
-
-        if (!registerWifiCallback(request)) {
-            Log.w(TAG, "Retrying the Wi-Fi registration without the location flag");
-            networkCallback = plainCallback();
-            if (!registerWifiCallback(request)) {
-                monitoringFailed = true;
-                Log.e(TAG, "No network callback could be registered; relying on the periodic check");
-            }
-        }
-
-        // A second subscription with no transport filter: it fires for handovers between mobile
-        // data and Wi-Fi, so a change is seen even if the Wi-Fi registration is the one that broke.
-        defaultCallback = new ConnectivityManager.NetworkCallback() {
-            @Override
-            public void onAvailable(Network network) {
-                scheduleReconcile();
-            }
-
-            @Override
-            public void onLost(Network network) {
-                scheduleReconcile();
-            }
-        };
-        try {
-            connectivityManager.registerDefaultNetworkCallback(defaultCallback, worker);
-        } catch (RuntimeException e) {
-            Log.e(TAG, "Could not register the default network callback", e);
-        }
+        registerCallbacks();
 
         // If an OEM power manager kills this service, the watchdog is what still applies the
         // right setting, so it is scheduled from here and kept independently of this process.
@@ -168,6 +138,10 @@ public class DNSService extends Service {
             WatchdogJobService.cancel(this);
             stopSelf();
             return START_NOT_STICKY;
+        }
+
+        if (intent != null && ACTION_REFRESH.equals(intent.getAction()) && worker != null) {
+            worker.post(this::refreshRegistration);
         }
 
         // A restart (from the boot receiver, an update, or the watchdog) must re-evaluate instead
@@ -275,6 +249,74 @@ public class DNSService extends Service {
             Log.e(TAG, "Could not register the Wi-Fi network callback", e);
             return false;
         }
+    }
+
+    private void registerCallbacks() {
+        NetworkRequest request = new NetworkRequest.Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .build();
+
+        // FLAG_INCLUDE_LOCATION_INFO is what makes the SSID readable from the callback's
+        // NetworkCapabilities on Android 12 and newer. Without it getSSID() reports
+        // "<unknown ssid>" even with every permission granted, and the switch never happens.
+        // The int constructor only exists from API 31, and a few builds refuse the flagged
+        // subscription outright, so fall back to the plain one instead of monitoring nothing.
+        networkCallback = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                ? locationCallback()
+                : plainCallback();
+
+        registeredPermissions = Reconciler.wifiPermissionFingerprint(this);
+        Log.i(TAG, "registering with wifiPermissions=" + registeredPermissions);
+
+        if (!registerWifiCallback(request)) {
+            Log.w(TAG, "Retrying the Wi-Fi registration without the location flag");
+            networkCallback = plainCallback();
+            if (!registerWifiCallback(request)) {
+                monitoringFailed = true;
+                Log.e(TAG, "No network callback could be registered; relying on the periodic check");
+            }
+        }
+
+        // A second subscription with no transport filter: it fires for handovers between mobile
+        // data and Wi-Fi, so a change is seen even if the Wi-Fi registration is the one that broke.
+        defaultCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                scheduleReconcile();
+            }
+
+            @Override
+            public void onLost(Network network) {
+                scheduleReconcile();
+            }
+        };
+        try {
+            connectivityManager.registerDefaultNetworkCallback(defaultCallback, worker);
+        } catch (RuntimeException e) {
+            Log.e(TAG, "Could not register the default network callback", e);
+        }
+    }
+
+    /**
+     * A callback registered before the Wi-Fi permission was granted keeps reporting a redacted
+     * name: the redaction is decided when the network is described to the callback, not per read.
+     * Granting the permission therefore does nothing until the subscription is made again, which
+     * is why the app used to need a manual restart.
+     */
+    private void refreshRegistration() {
+        if (monitoringFailed) {
+            return;
+        }
+        String permissions = Reconciler.wifiPermissionFingerprint(this);
+        if (permissions.equals(registeredPermissions)) {
+            return;
+        }
+
+        Log.i(TAG, "Wi-Fi permissions changed " + registeredPermissions + " -> " + permissions
+                + ", re-registering callbacks");
+        unregister(networkCallback);
+        unregister(defaultCallback);
+        registerCallbacks();
     }
 
     private void unregister(@Nullable ConnectivityManager.NetworkCallback callback) {

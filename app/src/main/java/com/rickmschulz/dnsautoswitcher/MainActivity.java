@@ -98,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
         requestRequiredPermissions();
         updateUI();
 
+        // Covers a permission granted from the system settings while the app was in the
+        // background: the service notices the change on its own timer, this just makes it
+        // immediate when the screen comes back.
+        if (hasWifiPermission()) {
+            refreshService();
+        }
+
         uiHandler.removeCallbacks(permissionPoll);
         uiHandler.postDelayed(permissionPoll, PERMISSION_POLL_MS);
     }
@@ -112,7 +119,21 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Granting the Wi-Fi permission does not un-redact a callback that was registered
+        // without it, so tell the service to subscribe again instead of making the user restart it.
+        if (requestCode == REQUEST_WIFI && hasWifiPermission()) {
+            refreshService();
+        }
         updateUI();
+    }
+
+    private void refreshService() {
+        if (!isServiceSwitchedOn()) {
+            return;
+        }
+        Intent intent = new Intent(this, DNSService.class).setAction(DNSService.ACTION_REFRESH);
+        startForegroundService(intent);
     }
 
     /**
@@ -198,13 +219,7 @@ public class MainActivity extends AppCompatActivity {
      * redact it without location, so either one counts as "we have a way in".
      */
     private boolean hasWifiPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES)
-                == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED;
+        return DNSService.canReadWifiName(this);
     }
 
     private boolean isServiceSwitchedOn() {
