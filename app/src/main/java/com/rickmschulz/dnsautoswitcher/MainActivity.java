@@ -2,6 +2,8 @@ package com.rickmschulz.dnsautoswitcher;
 
 import android.Manifest;
 import android.content.Intent;
+import android.net.Uri;
+import android.provider.Settings;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         inputSSID = findViewById(R.id.input_ssid);
         inputDNS = findViewById(R.id.input_dns_id);
         btnAction = findViewById(R.id.btn_save);
+        findViewById(R.id.btn_fix_permission).setOnClickListener(v -> openAppSettings());
         findViewById(R.id.btn_settings).setOnClickListener(
                 v -> startActivity(new Intent(this, SettingsActivity.class)));
         textStatus = findViewById(R.id.text_status);
@@ -130,6 +134,38 @@ public class MainActivity extends AppCompatActivity {
             refreshService();
         }
         updateUI();
+    }
+
+    /**
+     * Asked once, right after the first start, because it is the difference between switching
+     * always and switching only while this screen is open - and nothing in the app can request it
+     * on Android 11 and later. The system only accepts it from the app's own settings screen.
+     */
+    private void explainBackgroundLocationIfNeeded() {
+        if (!hasWifiPermission() || Reconciler.hasBackgroundLocation(this)) {
+            return;
+        }
+        if (prefs.getBoolean(Reconciler.KEY_BACKGROUND_EXPLAINED, false)) {
+            return;
+        }
+        prefs.edit().putBoolean(Reconciler.KEY_BACKGROUND_EXPLAINED, true).apply();
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.background_title)
+                .setMessage(R.string.background_message)
+                .setPositiveButton(R.string.action_open_settings, (dialog, which) -> openAppSettings())
+                .setNegativeButton(R.string.action_later, null)
+                .show();
+    }
+
+    /** Straight to the app's own permission screen, which is where the location mode lives. */
+    private void openAppSettings() {
+        try {
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", getPackageName(), null)));
+        } catch (RuntimeException e) {
+            Toast.makeText(this, R.string.toast_cannot_open_settings, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void refreshService() {
@@ -286,6 +322,8 @@ public class MainActivity extends AppCompatActivity {
         // The service reports itself alive from its own onCreate, which runs after this handler.
         btnAction.postDelayed(this::updateUI, 500);
         Toast.makeText(this, R.string.toast_started, Toast.LENGTH_SHORT).show();
+
+        explainBackgroundLocationIfNeeded();
     }
 
     private void stopMonitoring() {
@@ -319,19 +357,37 @@ public class MainActivity extends AppCompatActivity {
         // it is - and the status line never repeats what that block already says.
         textHelp.setVisibility(canWrite ? View.GONE : View.VISIBLE);
 
+        boolean redacted = switchedOn && "unknown".equals(prefs.getString(DNSService.KEY_LAST_STATE, ""));
+        View fixPermission = findViewById(R.id.btn_fix_permission);
+
         if (!canWrite) {
             textStatus.setText(R.string.status_missing_permission);
             textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
+            fixPermission.setVisibility(View.VISIBLE);
         } else if (!canReadSsid) {
             textStatus.setText(R.string.status_missing_wifi_permission);
             textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
+            fixPermission.setVisibility(View.VISIBLE);
+        } else if (redacted && !Reconciler.hasBackgroundLocation(this)) {
+            // Foreground permission is held but the name is still hidden: the app is only allowed
+            // to know location while it is on screen, and the Wi-Fi name counts as location.
+            textStatus.setText(R.string.status_background_redacted);
+            textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
+            fixPermission.setVisibility(View.VISIBLE);
+        } else if (redacted) {
+            // Everything the system offers is granted and the name is still withheld.
+            textStatus.setText(R.string.status_background_blocked);
+            textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
+            fixPermission.setVisibility(View.VISIBLE);
         } else if (stale) {
             textStatus.setText(R.string.status_stale);
             textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
+            fixPermission.setVisibility(View.GONE);
         } else {
             textStatus.setText(active ? R.string.status_running : R.string.status_stopped);
             textStatus.setTextColor(ContextCompat.getColor(this,
                     active ? R.color.state_idle : R.color.state_muted));
+            fixPermission.setVisibility(View.GONE);
         }
 
         showWhatTheServiceSees(active);

@@ -60,6 +60,14 @@ Which permission that is depends on the Android version:
 
 One detail that matters: Android decides whether to hide the Wi-Fi name at the moment the app subscribes to network changes. Granting the permission afterwards changes nothing until the app subscribes again. The app notices the change and subscribes again by itself, within about two seconds when the screen is open and within two minutes otherwise.
 
+#### "Allow all the time" is not optional
+
+Android treats the Wi-Fi name as location data. An app that is not on screen may only read it when Location is set to `Allow all the time`; with `Allow only while using the app` the name comes back unreadable as soon as you leave the app.
+
+The visible symptom is specific and worth recognising: switching **to** Private DNS works, because leaving Wi-Fi needs no name at all, but switching **back off** when you reconnect does nothing until you open the app again. The app detects this, says so on screen, and offers a button straight to its own permission screen.
+
+Android 11 and later do not let an app request that mode with a dialog. It has to be chosen in the app's settings: `App info`, `Permissions`, `Location`, `Allow all the time`. The app asks once after the first start when the mode is missing.
+
 ### 3. Configure
 
 1. Open the app.
@@ -140,6 +148,8 @@ Skipping this is what made v1.1 report itself as 1.0, and made updaters such as 
 * **Changed:** both screens keep clear of the status bar on Android 15 and later, where apps are drawn edge to edge.
 * **Changed:** the switching rules are covered by unit tests.
 * **Docs:** the README explains that MIUI and HyperOS need "USB debugging (Security settings)" enabled before `pm grant` is accepted.
+* **Fixed:** a reconnection that happened while the app was in the background is now recognised, instead of waiting for the next network change.
+* **Fixed:** the app explains when Location is set to "only while using the app", which hides the Wi-Fi name from a background service, and links to the screen where that is changed.
 
 **v1.1**
 * **Fixed:** The app was only partially working as intended. This release fixes the underlying issues and restores full functionality.

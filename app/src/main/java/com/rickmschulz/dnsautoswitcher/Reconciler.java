@@ -36,6 +36,8 @@ final class Reconciler {
     static final String KEY_LAST_CHECK = "last_check_millis";
     /** Opt-in: keep the monitoring service in the foreground with a persistent notification. */
     static final String KEY_SHOW_NOTIFICATION = "show_notification";
+    /** Whether the user has already been told that a background app may not see the Wi-Fi name. */
+    static final String KEY_BACKGROUND_EXPLAINED = "background_location_explained";
 
     static final String MODE_OFF = SwitchPolicy.MODE_OFF;
     static final String MODE_HOSTNAME = SwitchPolicy.MODE_HOSTNAME;
@@ -74,11 +76,28 @@ final class Reconciler {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
-    /** Which of the Wi-Fi permissions are held, so a change in either one is noticed. */
+    /**
+     * Which of the Wi-Fi permissions are held, so a change in any of them is noticed. Background
+     * location is included because it changes whether the name is readable while in the background,
+     * and a subscription made before it was granted keeps returning the redacted name.
+     */
     static String wifiPermissionFingerprint(Context context) {
         return (granted(context, Manifest.permission.NEARBY_WIFI_DEVICES) ? "1" : "0")
                 + (granted(context, Manifest.permission.ACCESS_FINE_LOCATION) ? "1" : "0")
-                + (granted(context, Manifest.permission.ACCESS_COARSE_LOCATION) ? "1" : "0");
+                + (granted(context, Manifest.permission.ACCESS_COARSE_LOCATION) ? "1" : "0")
+                + (hasBackgroundLocation(context) ? "1" : "0");
+    }
+
+    /**
+     * Whether the app may read the Wi-Fi name while it is not in the foreground. Android gates the
+     * name as location data, so a background app sees nothing without this.
+     */
+    static boolean hasBackgroundLocation(Context context) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+            return true;
+        }
+        return context.checkSelfPermission(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private static boolean granted(Context context, String permission) {
