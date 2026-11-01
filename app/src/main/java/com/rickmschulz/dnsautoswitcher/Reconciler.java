@@ -105,13 +105,19 @@ final class Reconciler {
         Network wifi = findWifiNetwork(cm);
         String ssid = wifi == null ? null : ssidFromCapabilities(cm, wifi);
 
-        if (ssid == null) {
-            String fromWifiManager = ssidFromWifiManager(context);
-            if (fromWifiManager != null) {
-                return new Observation(true, fromWifiManager);
-            }
+        if (ssid != null) {
+            return new Observation(true, ssid);
         }
-        return new Observation(wifi != null, ssid);
+
+        // WifiManager is only a fallback for a redacted name, and only when it reports a real
+        // connection: several ROMs keep returning the last network after Wi-Fi is switched off,
+        // which would otherwise look like still being on it.
+        String fromWifiManager = ssidFromWifiManager(context);
+        if (fromWifiManager != null) {
+            return new Observation(true, fromWifiManager);
+        }
+
+        return new Observation(wifi != null, null);
     }
 
     /**
@@ -232,15 +238,20 @@ final class Reconciler {
         return SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
     }
 
+    @SuppressWarnings("deprecation") // isWifiEnabled/getNetworkId are the only connection test here
     private static String ssidFromWifiManager(Context context) {
         try {
             WifiManager wifiManager =
                     (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (wifiManager == null) {
+            if (wifiManager == null || !wifiManager.isWifiEnabled()) {
                 return null;
             }
             WifiInfo info = wifiManager.getConnectionInfo();
-            return SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
+            if (info == null || info.getNetworkId() == -1) {
+                // -1 means "not associated with any network": the SSID it reports is the last one.
+                return null;
+            }
+            return SwitchPolicy.normalizeSsid(info.getSSID());
         } catch (SecurityException e) {
             Log.w(TAG, "Cannot read the SSID without the location / nearby Wi-Fi permission", e);
         }

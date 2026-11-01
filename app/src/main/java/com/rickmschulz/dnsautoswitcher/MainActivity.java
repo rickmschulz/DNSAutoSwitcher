@@ -31,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_BACKGROUND_LOCATION = 103;
 
     /**
-     * The ADB permission is granted from outside the app, so the screen has to notice it on its
-     * own. Polling runs only while the permission is missing and the screen is visible.
+     * The service writes what it sees to preferences, and the permission is granted from outside
+     * the app, so the screen has to re-read them on its own while it is visible.
      */
-    private static final long PERMISSION_POLL_MS = 2000L;
+    private static final long UI_TICK_MS = 2000L;
 
     private TextInputEditText inputSSID;
     private TextInputEditText inputDNS;
@@ -45,13 +45,11 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences prefs;
 
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
-    private final Runnable permissionPoll = new Runnable() {
+    private final Runnable uiTick = new Runnable() {
         @Override
         public void run() {
             updateUI();
-            if (!DNSService.hasPermission(MainActivity.this)) {
-                uiHandler.postDelayed(this, PERMISSION_POLL_MS);
-            }
+            uiHandler.postDelayed(this, UI_TICK_MS);
         }
     };
 
@@ -108,13 +106,16 @@ public class MainActivity extends AppCompatActivity {
             refreshService();
         }
 
-        uiHandler.removeCallbacks(permissionPoll);
-        uiHandler.postDelayed(permissionPoll, PERMISSION_POLL_MS);
+        // Re-read while visible: the service decides on a worker thread and writes preferences,
+        // so the screen would otherwise keep showing what was true when it was opened - which
+        // made "Wi-Fi seen" look stuck on the network the phone had already left.
+        uiHandler.removeCallbacks(uiTick);
+        uiHandler.postDelayed(uiTick, UI_TICK_MS);
     }
 
     @Override
     protected void onPause() {
-        uiHandler.removeCallbacks(permissionPoll);
+        uiHandler.removeCallbacks(uiTick);
         super.onPause();
     }
 
