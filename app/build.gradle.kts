@@ -16,7 +16,10 @@ fun git(vararg args: String): String = try {
     ""
 }
 
-val gitTag: String = git("describe", "--tags", "--abbrev=0").removePrefix("v").ifEmpty { "1.2" }
+// Only release tags count. Any other tag (a backup, a marker) would otherwise become the version,
+// since describe picks the nearest tag of any kind.
+val gitTag: String = git("describe", "--tags", "--abbrev=0", "--match", "v[0-9]*")
+    .removePrefix("v").ifEmpty { "1.2" }
 val gitCommitCount: Int = git("rev-list", "--count", "HEAD").toIntOrNull() ?: 1
 
 android {

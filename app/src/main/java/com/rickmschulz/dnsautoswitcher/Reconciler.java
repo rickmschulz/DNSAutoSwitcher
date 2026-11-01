@@ -218,6 +218,10 @@ final class Reconciler {
         }
     }
 
+    // getAllNetworks() is deprecated from API 31, but it is still the only way to find a
+    // registered network that is not the active one, which is exactly the case here: Wi-Fi
+    // connected while mobile data is still the default route.
+    @SuppressWarnings("deprecation")
     private static Network findWifiNetwork(ConnectivityManager cm) {
         if (cm == null) {
             return null;
