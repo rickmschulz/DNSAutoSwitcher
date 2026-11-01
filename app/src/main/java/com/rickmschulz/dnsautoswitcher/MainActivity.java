@@ -13,7 +13,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.text.InputType;
+import android.view.Gravity;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +31,9 @@ import androidx.core.view.ViewCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_NOTIFICATIONS = 101;
@@ -39,8 +46,12 @@ public class MainActivity extends AppCompatActivity {
      */
     private static final long UI_TICK_MS = 2000L;
 
-    private TextInputEditText inputSSID;
+    private TextInputEditText inputNetwork;
     private TextInputEditText inputDNS;
+    private LinearLayout listNetworks;
+
+    /** The networks that should use the local resolver, in the order they were added. */
+    private final List<String> networks = new ArrayList<>();
     private Button btnAction;
     private TextView textStatus;
     private TextView textObserved;
@@ -67,8 +78,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SystemBars.pad(findViewById(R.id.main_root));
 
-        inputSSID = findViewById(R.id.input_ssid);
+        inputNetwork = findViewById(R.id.input_network);
         inputDNS = findViewById(R.id.input_dns_id);
+        listNetworks = findViewById(R.id.list_networks);
         btnAction = findViewById(R.id.btn_save);
         findViewById(R.id.btn_fix_permission).setOnClickListener(v -> openAppSettings());
         findViewById(R.id.btn_settings).setOnClickListener(
@@ -81,8 +93,13 @@ public class MainActivity extends AppCompatActivity {
         textVersion.setText(getString(R.string.version_label, getVersionName(), getVersionCodeLong()));
 
         prefs = getSharedPreferences(DNSService.PREFS, MODE_PRIVATE);
-        inputSSID.setText(prefs.getString(DNSService.KEY_HOME_SSID, ""));
+        networks.clear();
+        networks.addAll(Reconciler.configuredNetworks(this));
+        renderNetworks();
         inputDNS.setText(prefs.getString(DNSService.KEY_PRIVATE_DNS, ""));
+
+        findViewById(R.id.btn_add_network).setOnClickListener(v -> addNetworkFromField());
+        findViewById(R.id.btn_use_current).setOnClickListener(v -> addCurrentNetwork());
 
         btnAction.setOnClickListener(v -> {
             if (isServiceActive() && !isServiceStale()) {
@@ -302,16 +319,19 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        String ssid = inputSSID.getText() == null ? "" : inputSSID.getText().toString().trim();
         String dnsId = inputDNS.getText() == null ? "" : inputDNS.getText().toString().trim();
 
-        if (ssid.isEmpty() || dnsId.isEmpty()) {
+        if (networks.isEmpty()) {
+            Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (dnsId.isEmpty()) {
             Toast.makeText(this, R.string.toast_fill_both_fields, Toast.LENGTH_SHORT).show();
             return;
         }
 
+        Reconciler.saveNetworks(this, networks);
         prefs.edit()
-                .putString(DNSService.KEY_HOME_SSID, ssid)
                 .putString(DNSService.KEY_PRIVATE_DNS, dnsId)
                 .putBoolean(DNSService.KEY_ENABLED, true)
                 .apply();
@@ -324,6 +344,94 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, R.string.toast_started, Toast.LENGTH_SHORT).show();
 
         explainBackgroundLocationIfNeeded();
+    }
+
+    private void addNetworkFromField() {
+        String typed = inputNetwork.getText() == null ? "" : inputNetwork.getText().toString().trim();
+        addNetwork(typed);
+    }
+
+    private void addCurrentNetwork() {
+        Reconciler.Observation seen = Reconciler.observe(this);
+        if (seen.ssid == null) {
+            Toast.makeText(this, R.string.toast_cannot_read_network, Toast.LENGTH_LONG).show();
+            return;
+        }
+        addNetwork(seen.ssid);
+    }
+
+    private void addNetwork(String ssid) {
+        String value = ssid == null ? "" : ssid.trim();
+        if (value.isEmpty()) {
+            Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        for (String existing : networks) {
+            if (existing.equalsIgnoreCase(value)) {
+                Toast.makeText(this, R.string.toast_network_duplicate, Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        networks.add(value);
+        inputNetwork.setText("");
+        networksChanged();
+        Toast.makeText(this, R.string.toast_network_added, Toast.LENGTH_SHORT).show();
+    }
+
+    private void removeNetwork(String ssid) {
+        networks.remove(ssid);
+        networksChanged();
+    }
+
+    /** Persist the list and let a running service apply it at once. */
+    private void networksChanged() {
+        Reconciler.saveNetworks(this, networks);
+        renderNetworks();
+        refreshService();
+        updateUI();
+    }
+
+    /**
+     * One row per network, built in code because the list is only as long as the user makes it.
+     * Each row carries its own Remove button, so removal is unambiguous when two names are similar.
+     */
+    private void renderNetworks() {
+        listNetworks.removeAllViews();
+
+        if (networks.isEmpty()) {
+            TextView empty = new TextView(this);
+            empty.setText(R.string.networks_empty);
+            empty.setTextSize(13);
+            empty.setTextColor(ContextCompat.getColor(this, R.color.state_muted));
+            empty.setPadding(0, 8, 0, 8);
+            listNetworks.addView(empty);
+            return;
+        }
+
+        for (String network : new ArrayList<>(networks)) {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(0, 4, 0, 4);
+
+            TextView name = new TextView(this);
+            name.setText(network);
+            name.setTextSize(15);
+            name.setSingleLine(true);
+            name.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            LinearLayout.LayoutParams nameParams =
+                    new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            name.setLayoutParams(nameParams);
+            row.addView(name);
+
+            Button remove = new Button(this, null, android.R.attr.borderlessButtonStyle);
+            remove.setText(R.string.action_remove);
+            remove.setOnClickListener(v -> removeNetwork(network));
+            row.addView(remove);
+
+            listNetworks.addView(row);
+        }
     }
 
     private void stopMonitoring() {
@@ -350,7 +458,11 @@ public class MainActivity extends AppCompatActivity {
                 ContextCompat.getColor(this, active ? R.color.state_active : R.color.state_idle)));
         // Without the ADB permission nothing the service does can work, so do not pretend it can.
         btnAction.setEnabled(canWrite);
-        inputSSID.setEnabled(!active);
+        // The network list stays editable while running: editing it saves immediately and asks
+        // the service to re-evaluate, so a new network takes effect without stopping anything.
+        inputNetwork.setEnabled(true);
+        findViewById(R.id.btn_add_network).setEnabled(true);
+        findViewById(R.id.btn_use_current).setEnabled(true);
         inputDNS.setEnabled(!active);
 
         // The instructions exist only to get the permission granted, so they disappear the moment
