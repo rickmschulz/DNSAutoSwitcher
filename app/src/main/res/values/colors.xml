@@ -2,4 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- State colours used by the status line and the primary button. -->
+    <color name="state_active">#D32F2F</color>
+    <color name="state_idle">#1976D2</color>
+    <color name="state_muted">#616161</color>
 </resources>

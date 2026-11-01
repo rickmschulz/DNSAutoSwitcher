@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -10,7 +12,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Home Wi-Fi Name (SSID)">
+        android:hint="@string/hint_home_ssid">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/input_ssid"
@@ -23,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="PrivateDNS ID (e.g. 12345.dns.nextdns.io)">
+        android:hint="@string/hint_private_dns">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/input_dns_id"
@@ -37,15 +39,63 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="32dp"
-        android:text="Save &amp; Start Service" />
+        android:text="@string/action_start" />
 
     <TextView
+        android:id="@+id/text_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textSize="13sp"
+        tools:text="Service running" />
+
+    <TextView
+        android:id="@+id/text_observed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="@color/state_muted"
+        android:textSize="12sp"
+        tools:text="Wi-Fi seen: HomeNet" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_fix_permission"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        android:text="@string/action_open_settings" />
+
+    <TextView
+        android:id="@+id/text_help"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="IMPORTANT:\nDon't forget to grant ADB permission:\n\nadb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECURE_SETTINGS"
+        android:text="@string/permission_help"
         android:textAlignment="center"
-        android:textColor="#D32F2F"
-        android:textSize="12sp"/>
+        android:textColor="@color/state_active"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/btn_settings"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/action_settings" />
+
+    <TextView
+        android:id="@+id/text_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/state_muted"
+        android:textSize="11sp"
+        tools:text="Version 1.2 (22)" />
 
 </LinearLayout>
