@@ -63,6 +63,21 @@ public class DNSService extends Service {
     private static final long SETTLE_MS = 900L;
 
     /**
+     * When a decision cannot be made the network details are usually just late: right after
+     * connecting, Android reports the Wi-Fi name as unreadable, and no further callback arrives
+     * once it becomes readable. Without these retries the switch waits for the next event, which
+     * on a reconnection that already happened may be minutes or hours away.
+     */
+    private static final long[] UNKNOWN_RETRY_MS = {1_500L, 4_000L, 8_000L, 15_000L};
+
+    /**
+     * One confirming look after every decision. A connection reports several callbacks and the
+     * first evaluation can land before the Wi-Fi network exists at all, which yields "away" and,
+     * with no further callback, would stay wrong until the next event.
+     */
+    private static final long VERIFY_MS = 8_000L;
+
+    /**
      * A cheap periodic re-check while the service lives. The watchdog job covers being killed
      * outright; this covers callbacks that never arrive.
      */
@@ -81,6 +96,10 @@ public class DNSService extends Service {
     private ConnectivityManager.NetworkCallback networkCallback;
     private ConnectivityManager.NetworkCallback defaultCallback;
     private Runnable reconcileTask;
+    /** How many of {@link #UNKNOWN_RETRY_MS} are still available for the current evaluation. */
+    private int retriesLeft;
+    /** Whether the current evaluation is the confirming look. */
+    private boolean verifying;
     /** Set when no network subscription could be established at all. */
     private boolean monitoringFailed;
     /** Which Wi-Fi permissions the callbacks were registered with. */
@@ -189,6 +208,8 @@ public class DNSService extends Service {
         }
 
         if (intent != null && ACTION_REFRESH.equals(intent.getAction()) && worker != null) {
+            retriesLeft = UNKNOWN_RETRY_MS.length;
+            verifying = false;
             worker.post(this::refreshRegistration);
         }
 
@@ -380,13 +401,42 @@ public class DNSService extends Service {
 
     private void scheduleReconcile() {
         Log.d(TAG, "network event");
+        retriesLeft = UNKNOWN_RETRY_MS.length;
+        verifying = false;
         worker.removeCallbacks(reconcileTask);
         worker.postDelayed(reconcileTask, SETTLE_MS);
     }
 
     private void reconcile() {
-        Reconciler.evaluate(this);
+        boolean confirming = verifying;
+        verifying = false;
+
+        SwitchPolicy.State state = Reconciler.evaluate(this);
         updateNotification();
+
+        if (state != null) {
+            retriesLeft = 0;
+            if (!confirming) {
+                // Look once more shortly, in case this evaluation ran before the network existed.
+                verifying = true;
+                Log.d(TAG, "confirming the decision in " + VERIFY_MS + " ms");
+                worker.removeCallbacks(reconcileTask);
+                worker.postDelayed(reconcileTask, VERIFY_MS);
+            }
+            return;
+        }
+
+        // Not enough information yet. Try again shortly instead of waiting for the next network
+        // event, which for a connection that has already settled may never come.
+        if (retriesLeft > 0) {
+            long delay = UNKNOWN_RETRY_MS[UNKNOWN_RETRY_MS.length - retriesLeft];
+            retriesLeft--;
+            Log.i(TAG, "not enough information, checking again in " + delay + " ms");
+            worker.removeCallbacks(reconcileTask);
+            worker.postDelayed(reconcileTask, delay);
+        } else {
+            Log.w(TAG, "giving up on this evaluation; waiting for the next network event");
+        }
     }
 
     private void markAlive(boolean alive) {
