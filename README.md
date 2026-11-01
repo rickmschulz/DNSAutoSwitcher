@@ -33,11 +33,11 @@ adb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECU
 > If you need help with ADB, this [page](https://developer.android.com/tools/adb) can help you.
 
 > [!IMPORTANT]
-> **Xiaomi, Redmi and POCO (MIUI / HyperOS):** the command above is rejected unless you enable a second developer setting. Without it `pm grant` fails with `java.lang.SecurityException: grantRuntimePermission: Neither user 2000 nor current process has android.permission.GRANT_RUNTIME_PERMISSIONS` — the ROM has removed that permission from the shell user, so nothing the app can do fixes it.
+> **Xiaomi, Redmi and POCO (MIUI / HyperOS):** the command above is rejected unless you enable a second developer setting. Without it `pm grant` fails with `java.lang.SecurityException: grantRuntimePermission: Neither user 2000 nor current process has android.permission.GRANT_RUNTIME_PERMISSIONS`. The ROM has removed that permission from the shell user, so nothing the app can do fixes it.
 >
 > 1. Enable `Developer options` (tap the MIUI version seven times).
 > 2. In `Developer options`, enable **`USB debugging`**.
-> 3. Also enable **`USB debugging (Security settings)`** — *"Allow granting permissions and simulating input via USB debugging"*. Signing in to a Mi account may be needed to unlock the toggle.
+> 3. Also enable **`USB debugging (Security settings)`**, described as *"Allow granting permissions and simulating input via USB debugging"*. Signing in to a Mi account may be needed to unlock the toggle.
 > 4. Reconnect USB, accept the debugging prompt, and run the `pm grant` command again.
 >
 > Verify with `adb shell dumpsys package com.rickmschulz.dnsautoswitcher | grep WRITE_SECURE_SETTINGS`, which should report `granted=true`.
