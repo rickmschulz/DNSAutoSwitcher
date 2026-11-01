@@ -89,22 +89,6 @@ Android stops background services, and some phone makers are far more aggressive
 
 If switching is slow rather than wrong, the service is being stopped by the system. On MIUI and HyperOS, set the app to `No restrictions` under Battery saver and enable it under Autostart.
 
-## How to test it
-
-The failure that hurts is the one nobody notices: the switch works while the app is open and silently stops once it is closed. So the release gate is the screen-off case, not the visible one.
-
-Run this before publishing any release, on a real phone, with the app installed over the previous version:
-
-1. **On the configured network, app open.** Private DNS should be off within a second of the app opening.
-2. **On the configured network, app closed.** Turn Wi-Fi off, wait, turn it on. Private DNS should go on and back off without the app being opened.
-3. **Screen off.** Repeat step 2 with the screen off the whole time. This is the case a background location permission decides.
-4. **Another network.** Join a network that is not in the list. Private DNS should be on within a second.
-5. **Force stop.** Force stop the app from its settings, then change networks. Nothing has to switch, but the app must say it is not updating rather than claim it is running.
-6. **Reboot.** After restarting the phone, the app should be monitoring again without being opened, and the version shown should be the one that was installed.
-7. **Update.** Install a new build over the old one. Monitoring should resume without a reboot.
-
-If step 2 or 3 fails while everything else passes, read the status line in the app: it distinguishes a missing permission from the phone hiding the Wi-Fi name, and those have different fixes.
-
 ## Architecture
 
 - **SwitchPolicy.java:** The decisions, as pure functions with no Android dependency: is this one of the configured networks, which Private DNS mode does that imply, and does anything need writing. Unit tested on the host.
