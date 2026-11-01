@@ -2,13 +2,18 @@
     <string name="app_name">DNSAutoSwitcher</string>
     <string name="version_label">Version %1$s (%2$d)</string>
 
+    <string name="hint_home_ssid">Home Wi-Fi name (SSID)</string>
+    <string name="hint_private_dns">Private DNS hostname (e.g. 12345.dns.nextdns.io)</string>
+
     <string name="action_start">Save &amp; Start Service</string>
     <string name="action_stop">Stop Service</string>
 
     <string name="status_running">Service running — Private DNS follows your Wi-Fi network.</string>
     <string name="status_stopped">Service stopped.</string>
     <string name="status_missing_permission">Missing permission. Connect the phone and run:\n\nadb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECURE_SETTINGS</string>
-    <string name="status_missing_wifi_permission">Missing permission to read the Wi-Fi network name. Grant location (or nearby devices) access.</string>
+    <string name="status_missing_wifi_permission">Missing permission to read the Wi-Fi network name. Grant location, or nearby devices on Android 13+.</string>
+
+    <string name="permission_help">IMPORTANT\nGrant the ADB permission once:\n\nadb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECURE_SETTINGS\n\nXiaomi, Redmi and POCO (MIUI / HyperOS): the command is rejected unless you also enable Developer options → “USB debugging (Security settings)”.</string>
 
     <string name="toast_fill_both_fields">Please fill in both fields</string>
     <string name="toast_started">Service started</string>

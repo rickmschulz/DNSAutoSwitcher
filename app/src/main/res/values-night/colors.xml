@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="state_active">#FF6B6B</color>
+    <color name="state_idle">#64B5F6</color>
+    <color name="state_muted">#BDBDBD</color>
+</resources>

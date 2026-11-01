@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.pm.PackageInfoCompat;
+import androidx.core.view.ViewCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -108,14 +109,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!hasWifiPermission()) {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, REQUEST_WIFI);
+            ActivityCompat.requestPermissions(this, wifiPermissions(), REQUEST_WIFI);
             return;
         }
 
-        // From Android 10 the SSID is only readable in the background with background location.
+        // Up to Android 12 the SSID is only readable in the background with background location.
         if (!backgroundLocationAsked
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
                 && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
@@ -129,9 +127,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Android 13 replaced the location gate for SSID reads with a normal nearby-devices permission. */
+    private String[] wifiPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return new String[]{Manifest.permission.NEARBY_WIFI_DEVICES};
+        }
+        return new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        };
+    }
+
     private boolean hasWifiPermission() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED;
+        String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                ? Manifest.permission.NEARBY_WIFI_DEVICES
+                : Manifest.permission.ACCESS_FINE_LOCATION;
+        return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean isServiceActive() {
@@ -182,7 +193,8 @@ public class MainActivity extends AppCompatActivity {
         boolean canReadSsid = hasWifiPermission();
 
         btnAction.setText(active ? R.string.action_stop : R.string.action_start);
-        btnAction.setBackgroundColor(Color.parseColor(active ? "#D32F2F" : "#1976D2"));
+        ViewCompat.setBackgroundTintList(btnAction, ColorStateList.valueOf(
+                ContextCompat.getColor(this, active ? R.color.state_active : R.color.state_idle)));
         // Without the ADB permission nothing the service does can work, so do not pretend it can.
         btnAction.setEnabled(canWrite);
         inputSSID.setEnabled(!active);
@@ -190,13 +202,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (!canWrite) {
             textStatus.setText(R.string.status_missing_permission);
-            textStatus.setTextColor(Color.parseColor("#D32F2F"));
+            textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
         } else if (!canReadSsid) {
             textStatus.setText(R.string.status_missing_wifi_permission);
-            textStatus.setTextColor(Color.parseColor("#D32F2F"));
+            textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
         } else {
             textStatus.setText(active ? R.string.status_running : R.string.status_stopped);
-            textStatus.setTextColor(Color.parseColor(active ? "#1976D2" : "#666666"));
+            textStatus.setTextColor(ContextCompat.getColor(this,
+                    active ? R.color.state_idle : R.color.state_muted));
         }
     }
 }
