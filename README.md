@@ -115,30 +115,15 @@ If step 2 or 3 fails while everything else passes, read the status line in the a
 - **MainActivity.java / SettingsActivity.java:** Configuration, live state, and the notification preference.
 - **Permissions:** `WRITE_SECURE_SETTINGS`, granted once over ADB, is what allows writing those two global settings.
 
-## Releasing
-
-The version is derived from git so the tag, the APK and the version shown in the app can never disagree:
-
-- `versionName` is the last tag, stripped of its `v` (`git tag v1.2` → `1.2`)
-- `versionCode` is the commit count, which only ever grows, so an update is always newer than the installed build
-
-Cut the tag before publishing a release:
-
-```
-git tag v1.2
-git push origin v1.2
-```
-
-Skipping this is what made v1.1 report itself as 1.0, and made updaters such as Obtainium keep offering a release that was already installed.
-
 ## Changelog
 
-**Unreleased**
+**v1.2**
+
+All credit for this release goes to [@tanc](https://github.com/tanc) for completely refactoring the core background service for modern Android reliability and building the new multiple-network feature.
+
 * **Added:** any number of Wi-Fi networks can be configured, and all of them count as local. The single network of earlier versions is migrated automatically.
 * **Added:** "Use current" adds the network the phone is connected to.
 * **Changed:** the notification says how many networks are configured instead of naming a single one.
-
-**v1.2**
 * **Fixed:** the version now comes from the git tag instead of being edited by hand, and is shown inside the app.
 * **Fixed:** the service restarts after an app update, not only after a reboot.
 * **Fixed:** an unknown SSID no longer disables Private DNS while at home.
