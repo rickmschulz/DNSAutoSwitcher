@@ -94,6 +94,8 @@ Skipping this is what made v1.1 report itself as 1.0, and made updaters such as 
 * **Fixed:** stopping the service restores Private DNS instead of leaving it off.
 * **Changed:** fewer permissions on Android 13+, a state line and Stop action in the notification, and a release build that is minified.
 * **Changed:** the ADB instructions disappear from the app once the permission is granted.
+* **Changed:** the persistent notification is opt-in, controlled from a new Settings screen.
+* **Changed:** wording no longer assumes the configured network is a home network.
 * **Docs:** the README explains that MIUI and HyperOS need "USB debugging (Security settings)" enabled before `pm grant` is accepted.
 
 **v1.1**

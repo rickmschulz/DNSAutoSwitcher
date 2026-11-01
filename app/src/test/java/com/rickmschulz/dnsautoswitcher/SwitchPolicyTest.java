@@ -19,26 +19,26 @@ public class SwitchPolicyTest {
     // decide()
 
     @Test
-    public void noWifiMeansAway() {
-        assertEquals(SwitchPolicy.State.AWAY,
+    public void noWifiMeansRemote() {
+        assertEquals(SwitchPolicy.State.REMOTE,
                 SwitchPolicy.decide(HOME, DNS, false, null));
     }
 
     @Test
-    public void homeSsidMeansHome() {
-        assertEquals(SwitchPolicy.State.HOME,
+    public void configuredSsidMeansLocal() {
+        assertEquals(SwitchPolicy.State.LOCAL,
                 SwitchPolicy.decide(HOME, DNS, true, HOME));
     }
 
     @Test
     public void quotedHomeSsidStillMatches() {
-        assertEquals(SwitchPolicy.State.HOME,
+        assertEquals(SwitchPolicy.State.LOCAL,
                 SwitchPolicy.decide(HOME, DNS, true, "\"" + HOME + "\""));
     }
 
     @Test
-    public void otherNetworkMeansAway() {
-        assertEquals(SwitchPolicy.State.AWAY,
+    public void otherNetworkMeansRemote() {
+        assertEquals(SwitchPolicy.State.REMOTE,
                 SwitchPolicy.decide(HOME, DNS, true, "CafeWiFi"));
     }
 
@@ -57,7 +57,7 @@ public class SwitchPolicyTest {
 
     @Test
     public void ssidIsComparedTrimmed() {
-        assertEquals(SwitchPolicy.State.HOME,
+        assertEquals(SwitchPolicy.State.LOCAL,
                 SwitchPolicy.decide(HOME, DNS, true, "  " + HOME + "  "));
     }
 
@@ -70,17 +70,17 @@ public class SwitchPolicyTest {
     }
 
     @Test
-    public void withoutAHomeSsidEveryNetworkIsAway() {
-        assertEquals(SwitchPolicy.State.AWAY,
+    public void withoutAConfiguredSsidEveryNetworkIsRemote() {
+        assertEquals(SwitchPolicy.State.REMOTE,
                 SwitchPolicy.decide("", DNS, true, "CafeWiFi"));
     }
 
     // desiredMode()
 
     @Test
-    public void homeTurnsPrivateDnsOffAndAwayTurnsItOn() {
-        assertEquals("off", SwitchPolicy.desiredMode(SwitchPolicy.State.HOME));
-        assertEquals("hostname", SwitchPolicy.desiredMode(SwitchPolicy.State.AWAY));
+    public void localTurnsPrivateDnsOffAndRemoteTurnsItOn() {
+        assertEquals("off", SwitchPolicy.desiredMode(SwitchPolicy.State.LOCAL));
+        assertEquals("hostname", SwitchPolicy.desiredMode(SwitchPolicy.State.REMOTE));
     }
 
     // normalizeSsid()

@@ -34,6 +34,8 @@ final class Reconciler {
     static final String KEY_LAST_SSID = "last_seen_ssid";
     static final String KEY_LAST_STATE = "last_state";
     static final String KEY_LAST_CHECK = "last_check_millis";
+    /** Opt-in: keep the monitoring service in the foreground with a persistent notification. */
+    static final String KEY_SHOW_NOTIFICATION = "show_notification";
 
     static final String MODE_OFF = SwitchPolicy.MODE_OFF;
     static final String MODE_HOSTNAME = SwitchPolicy.MODE_HOSTNAME;

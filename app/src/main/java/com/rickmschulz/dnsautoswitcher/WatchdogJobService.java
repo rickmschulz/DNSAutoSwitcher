@@ -89,12 +89,8 @@ public class WatchdogJobService extends JobService {
         if (System.currentTimeMillis() - lastCheck < DNSService.STALE_MS) {
             return;
         }
-        try {
-            startForegroundService(new Intent(this, DNSService.class));
-            Log.i(TAG, "watchdog asked for the service to come back");
-        } catch (RuntimeException e) {
-            Log.w(TAG, "The system refused to restart the service", e);
-        }
+        Log.i(TAG, "watchdog asked for the service to come back");
+        DNSService.start(this);
     }
 
     @Override

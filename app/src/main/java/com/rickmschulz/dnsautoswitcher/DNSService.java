@@ -50,6 +50,9 @@ public class DNSService extends Service {
     static final String ACTION_STOP = "com.rickmschulz.dnsautoswitcher.action.STOP";
     /** Re-read the network from scratch, e.g. after a permission that was missing is granted. */
     static final String ACTION_REFRESH = "com.rickmschulz.dnsautoswitcher.action.REFRESH";
+    /** Re-apply the notification preference without disturbing the monitoring. */
+    static final String ACTION_APPLY_NOTIFICATION =
+            "com.rickmschulz.dnsautoswitcher.action.APPLY_NOTIFICATION";
 
     private static final String CHANNEL_ID = "dns_autoswitcher";
     private static final int NOTIFICATION_ID = 1;
@@ -82,6 +85,8 @@ public class DNSService extends Service {
     private boolean monitoringFailed;
     /** Which Wi-Fi permissions the callbacks were registered with. */
     private String registeredPermissions = "";
+    /** Whether this instance is currently in the foreground with a notification. */
+    private boolean foreground;
 
     private final Runnable safetyNet = new Runnable() {
         @Override
@@ -103,6 +108,44 @@ public class DNSService extends Service {
         return Reconciler.canReadWifiName(context);
     }
 
+    static boolean showsNotification(android.content.Context context) {
+        return Reconciler.prefs(context).getBoolean(Reconciler.KEY_SHOW_NOTIFICATION, false);
+    }
+
+    /**
+     * Start monitoring in whichever shape the user asked for. A foreground service is what the
+     * system protects; a plain service is what leaves no notification, at the cost of being stopped
+     * sooner - which the periodic watchdog then covers.
+     */
+    static void start(android.content.Context context) {
+        Intent intent = new Intent(context, DNSService.class);
+        if (showsNotification(context)) {
+            try {
+                context.startForegroundService(intent);
+                return;
+            } catch (RuntimeException e) {
+                Log.e(TAG, "The system refused a foreground service start", e);
+                return;
+            }
+        }
+        try {
+            context.startService(intent);
+        } catch (RuntimeException e) {
+            // Background starts are limited; the persisted watchdog still applies the setting.
+            Log.w(TAG, "The system refused a background service start", e);
+        }
+    }
+
+    /** Apply the notification preference to a running instance without restarting it. */
+    static void applyNotificationSetting(android.content.Context context) {
+        try {
+            context.startService(new Intent(context, DNSService.class)
+                    .setAction(ACTION_APPLY_NOTIFICATION));
+        } catch (RuntimeException e) {
+            Log.w(TAG, "Could not apply the notification setting", e);
+        }
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -110,8 +153,9 @@ public class DNSService extends Service {
         prefs = Reconciler.prefs(this);
         connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-        createNotificationChannel();
-        startForeground(NOTIFICATION_ID, buildNotification(statusText()));
+        // The notification is opt-in. Without it the service runs as an ordinary started service,
+        // and the periodic job is what keeps the setting right if the system stops it.
+        updateForegroundMode();
         markAlive(true);
 
         workerThread = new HandlerThread("dns-switch");
@@ -138,6 +182,10 @@ public class DNSService extends Service {
             WatchdogJobService.cancel(this);
             stopSelf();
             return START_NOT_STICKY;
+        }
+
+        if (intent != null && ACTION_APPLY_NOTIFICATION.equals(intent.getAction())) {
+            updateForegroundMode();
         }
 
         if (intent != null && ACTION_REFRESH.equals(intent.getAction()) && worker != null) {
@@ -345,7 +393,32 @@ public class DNSService extends Service {
         prefs.edit().putBoolean(KEY_ALIVE, alive).apply();
     }
 
+    /** Turn the persistent notification on or off to match the preference, live. */
+    private void updateForegroundMode() {
+        boolean wanted = showsNotification(this);
+        if (wanted == foreground) {
+            if (wanted) {
+                updateNotification();
+            }
+            return;
+        }
+
+        if (wanted) {
+            createNotificationChannel();
+            startForeground(NOTIFICATION_ID, buildNotification(statusText()));
+            foreground = true;
+            Log.i(TAG, "notification on");
+        } else {
+            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
+            foreground = false;
+            Log.i(TAG, "notification off");
+        }
+    }
+
     private void updateNotification() {
+        if (!foreground) {
+            return;
+        }
         NotificationManager manager = getSystemService(NotificationManager.class);
         if (manager != null) {
             manager.notify(NOTIFICATION_ID, buildNotification(statusText()));
@@ -363,9 +436,17 @@ public class DNSService extends Service {
                 .equals(prefs.getString(KEY_LAST_STATE, ""))) {
             return getString(R.string.notification_unreadable_ssid);
         }
-        return MODE_HOSTNAME.equals(Reconciler.currentMode(this))
-                ? getString(R.string.notification_away)
-                : getString(R.string.notification_home);
+        String configured = prefs.getString(KEY_HOME_SSID, "");
+        String seen = prefs.getString(KEY_LAST_SSID, "");
+
+        if (MODE_HOSTNAME.equals(Reconciler.currentMode(this))) {
+            return configured.isEmpty()
+                    ? getString(R.string.notification_remote_generic)
+                    : getString(R.string.notification_remote, configured);
+        }
+        return seen.isEmpty()
+                ? getString(R.string.notification_local_generic)
+                : getString(R.string.notification_local, seen);
     }
 
     private void createNotificationChannel() {

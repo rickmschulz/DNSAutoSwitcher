@@ -8,10 +8,10 @@ package com.rickmschulz.dnsautoswitcher;
 final class SwitchPolicy {
 
     enum State {
-        /** On the configured home network: use the local resolver. */
-        HOME,
+        /** On the configured network, whatever it is (home, work, a hotspot): use the local resolver. */
+        LOCAL,
         /** No Wi-Fi, or a different network: use the configured provider. */
-        AWAY,
+        REMOTE,
         /** Not enough information: the caller must leave the current setting untouched. */
         UNKNOWN
     }
@@ -31,10 +31,10 @@ final class SwitchPolicy {
             return State.UNKNOWN;
         }
         if (!wifiConnected) {
-            return State.AWAY;
+            return State.REMOTE;
         }
         if (isEmpty(homeSsid)) {
-            return State.AWAY;
+            return State.REMOTE;
         }
         String ssid = normalizeSsid(currentSsid);
         if (ssid == null) {
@@ -42,15 +42,15 @@ final class SwitchPolicy {
             // as "away" is what used to switch filtering on while sitting at home.
             return State.UNKNOWN;
         }
-        return homeSsid.trim().equals(ssid) ? State.HOME : State.AWAY;
+        return homeSsid.trim().equals(ssid) ? State.LOCAL : State.REMOTE;
     }
 
     /** @return the Private DNS mode to store, or null when nothing should be written. */
     static String desiredMode(State state) {
         switch (state) {
-            case HOME:
+            case LOCAL:
                 return MODE_OFF;
-            case AWAY:
+            case REMOTE:
                 return MODE_HOSTNAME;
             default:
                 return null;

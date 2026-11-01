@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         inputSSID = findViewById(R.id.input_ssid);
         inputDNS = findViewById(R.id.input_dns_id);
         btnAction = findViewById(R.id.btn_save);
+        findViewById(R.id.btn_settings).setOnClickListener(
+                v -> startActivity(new Intent(this, SettingsActivity.class)));
         textStatus = findViewById(R.id.text_status);
         textObserved = findViewById(R.id.text_observed);
         textHelp = findViewById(R.id.text_help);
@@ -133,7 +135,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Intent intent = new Intent(this, DNSService.class).setAction(DNSService.ACTION_REFRESH);
-        startForegroundService(intent);
+        try {
+            startService(intent);
+        } catch (RuntimeException ignored) {
+            // The service is not running; nothing to refresh.
+        }
     }
 
     /**
@@ -245,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void restartMonitoring() {
         prefs.edit().putBoolean(DNSService.KEY_ENABLED, true).apply();
-        startForegroundService(new Intent(this, DNSService.class));
+        DNSService.start(this);
 
         updateUI();
         btnAction.postDelayed(this::updateUI, 500);
@@ -272,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
                 .putBoolean(DNSService.KEY_ENABLED, true)
                 .apply();
 
-        startForegroundService(new Intent(this, DNSService.class));
+        DNSService.start(this);
 
         updateUI();
         // The service reports itself alive from its own onCreate, which runs after this handler.

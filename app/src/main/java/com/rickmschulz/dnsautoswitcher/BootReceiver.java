@@ -25,7 +25,7 @@ public class BootReceiver extends BroadcastReceiver {
             return;
         }
 
-        Intent serviceIntent = new Intent(context, DNSService.class);
-        context.startForegroundService(serviceIntent);
+        // Start in whichever shape the user chose: foreground with a notification, or plain.
+        DNSService.start(context);
     }
 }
