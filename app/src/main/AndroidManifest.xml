@@ -46,6 +46,12 @@
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="network_policy_manager" />
         </service>
 
+        <!-- The watchdog: applies the setting even if the service was killed -->
+        <service
+            android:name=".WatchdogJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <!-- The "Ear" -->
         <receiver
             android:name=".BootReceiver"

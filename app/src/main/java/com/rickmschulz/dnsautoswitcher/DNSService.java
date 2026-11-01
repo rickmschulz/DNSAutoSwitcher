@@ -1,28 +1,21 @@
 package com.rickmschulz.dnsautoswitcher;
 
-import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Build;
-import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -37,51 +30,36 @@ import java.util.Locale;
  * Connected to the configured home SSID the mode is switched to "off" so the local resolver is
  * used; anywhere else it is switched back to "hostname" with the configured provider.
  *
- * All decisions run on a worker thread after a short settle delay, because the framework delivers
- * onAvailable/onCapabilitiesChanged/onLinkPropertiesChanged in a burst when a network connects and
- * the SSID is often still unknown in the first callback.
+ * The decisions themselves live in {@link SwitchPolicy}, the work of applying them in
+ * {@link Reconciler}, so the periodic watchdog can do the same job when this service is not alive.
  */
-// Deprecated Wi-Fi APIs are kept on purpose: they are the only fallback on API 28-32, where
-// NetworkCapabilities.getTransportInfo() does not exist.
-@SuppressWarnings("deprecation")
 public class DNSService extends Service {
 
-    private static final String TAG = "DNSService";
+    private static final String TAG = Reconciler.TAG;
 
-    static final String PREFS = "DNSAutoSwitcherPrefs";
-    static final String KEY_HOME_SSID = "home_ssid";
-    static final String KEY_PRIVATE_DNS = "privatedns_id";
-    /** User intent: should the service run at all. Survives reboot and app updates. */
-    static final String KEY_ENABLED = "service_enabled";
-    /** Whether an instance is currently alive. Written by the service only. */
-    static final String KEY_ALIVE = "service_alive";
-    /** The mode this service last wrote, so stopping it can undo its own change only. */
-    static final String KEY_LAST_APPLIED = "last_applied_mode";
-    /** What the last evaluation actually saw, so "it did nothing" is never invisible. */
-    static final String KEY_LAST_SSID = "last_seen_ssid";
-    static final String KEY_LAST_STATE = "last_state";
-    /** When the last evaluation ran: a stale value means events stopped arriving. */
-    static final String KEY_LAST_CHECK = "last_check_millis";
+    static final String PREFS = Reconciler.PREFS;
+    static final String KEY_HOME_SSID = Reconciler.KEY_HOME_SSID;
+    static final String KEY_PRIVATE_DNS = Reconciler.KEY_PRIVATE_DNS;
+    static final String KEY_ENABLED = Reconciler.KEY_ENABLED;
+    static final String KEY_ALIVE = Reconciler.KEY_ALIVE;
+    static final String KEY_LAST_APPLIED = Reconciler.KEY_LAST_APPLIED;
+    static final String KEY_LAST_SSID = Reconciler.KEY_LAST_SSID;
+    static final String KEY_LAST_STATE = Reconciler.KEY_LAST_STATE;
+    static final String KEY_LAST_CHECK = Reconciler.KEY_LAST_CHECK;
 
     static final String ACTION_STOP = "com.rickmschulz.dnsautoswitcher.action.STOP";
 
     private static final String CHANNEL_ID = "dns_autoswitcher";
     private static final int NOTIFICATION_ID = 1;
 
-    /** Private DNS modes as stored in Settings.Global.private_dns_mode. */
-    private static final String MODE_OFF = SwitchPolicy.MODE_OFF;
-    private static final String MODE_HOSTNAME = SwitchPolicy.MODE_HOSTNAME;
-
-    private static final String SETTING_MODE = "private_dns_mode";
-    private static final String SETTING_SPECIFIER = "private_dns_specifier";
+    private static final String MODE_HOSTNAME = Reconciler.MODE_HOSTNAME;
 
     /** Network callbacks arrive in bursts; wait until the connection has settled. */
     private static final long SETTLE_MS = 900L;
 
     /**
-     * A cheap periodic re-check. Callbacks are the mechanism, but an OEM power manager that
-     * freezes a background service silently stops them, and then the app looks alive while
-     * switching nothing. Two minutes of a binder call is nothing next to being wrong.
+     * A cheap periodic re-check while the service lives. The watchdog job covers being killed
+     * outright; this covers callbacks that never arrive.
      */
     private static final long SAFETY_NET_MS = 120_000L;
 
@@ -98,6 +76,9 @@ public class DNSService extends Service {
     private ConnectivityManager.NetworkCallback networkCallback;
     private ConnectivityManager.NetworkCallback defaultCallback;
     private Runnable reconcileTask;
+    /** Set when no network subscription could be established at all. */
+    private boolean monitoringFailed;
+
     private final Runnable safetyNet = new Runnable() {
         @Override
         public void run() {
@@ -108,25 +89,18 @@ public class DNSService extends Service {
             scheduleReconcile();
         }
     };
-    /** Set when no network subscription could be established at all. */
-    private boolean monitoringFailed;
 
-    /**
-     * True when the app may write Settings.Global. Granted once over ADB; a plain runtime request
-     * cannot obtain it, so every call site has to cope with it being missing.
-     */
-    static boolean hasPermission(Context context) {
-        return context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS)
-                == PackageManager.PERMISSION_GRANTED;
+    static boolean hasPermission(android.content.Context context) {
+        return Reconciler.hasPermission(context);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
-        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
         Log.i(TAG, "onCreate");
+        prefs = Reconciler.prefs(this);
+        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+
         createNotificationChannel();
         startForeground(NOTIFICATION_ID, buildNotification(statusText()));
         markAlive(true);
@@ -154,7 +128,7 @@ public class DNSService extends Service {
             networkCallback = plainCallback();
             if (!registerWifiCallback(request)) {
                 monitoringFailed = true;
-                Log.e(TAG, "No network callback could be registered; relying on the 2 minute check");
+                Log.e(TAG, "No network callback could be registered; relying on the periodic check");
             }
         }
 
@@ -177,9 +151,69 @@ public class DNSService extends Service {
             Log.e(TAG, "Could not register the default network callback", e);
         }
 
+        // If an OEM power manager kills this service, the watchdog is what still applies the
+        // right setting, so it is scheduled from here and kept independently of this process.
+        WatchdogJobService.schedule(this);
+
         // Apply the right state straight away instead of waiting for the next network change.
         worker.post(reconcileTask);
         worker.postDelayed(safetyNet, SAFETY_NET_MS);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "onStartCommand action=" + (intent == null ? "null" : intent.getAction()));
+        if (intent != null && ACTION_STOP.equals(intent.getAction())) {
+            prefs.edit().putBoolean(KEY_ENABLED, false).apply();
+            WatchdogJobService.cancel(this);
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
+        // A restart (from the boot receiver, an update, or the watchdog) must re-evaluate instead
+        // of waiting for the next network event.
+        if (worker != null) {
+            worker.post(reconcileTask);
+        }
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "onDestroy");
+        if (connectivityManager != null) {
+            unregister(networkCallback);
+            unregister(defaultCallback);
+        }
+
+        if (worker != null) {
+            if (reconcileTask != null) {
+                worker.removeCallbacks(reconcileTask);
+            }
+            worker.removeCallbacks(safetyNet);
+        }
+
+        // Never leave the device with Private DNS disabled: if we were the one that turned it off,
+        // put the configured provider back before going away.
+        Reconciler.restoreOnStop(this);
+
+        markAlive(false);
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
+
+        if (!prefs.getBoolean(KEY_ENABLED, false)) {
+            WatchdogJobService.cancel(this);
+        }
+
+        if (workerThread != null) {
+            workerThread.quitSafely();
+        }
+        super.onDestroy();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     private ConnectivityManager.NetworkCallback locationCallback() {
@@ -243,61 +277,7 @@ public class DNSService extends Service {
         }
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand action=" + (intent == null ? "null" : intent.getAction()));
-        if (intent != null && ACTION_STOP.equals(intent.getAction())) {
-            prefs.edit().putBoolean(KEY_ENABLED, false).apply();
-            stopSelf();
-            return START_NOT_STICKY;
-        }
-        return START_STICKY;
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.i(TAG, "onDestroy");
-        if (connectivityManager != null) {
-            unregister(networkCallback);
-            unregister(defaultCallback);
-        }
-
-        if (worker != null) {
-            if (reconcileTask != null) {
-                worker.removeCallbacks(reconcileTask);
-            }
-            worker.removeCallbacks(safetyNet);
-        }
-
-        // Never leave the device with Private DNS disabled: if we were the one that turned it off,
-        // put the configured provider back before going away.
-        if (SwitchPolicy.shouldRestoreOnStop(prefs.getString(KEY_LAST_APPLIED, ""),
-                prefs.getString(KEY_PRIVATE_DNS, ""))) {
-            applyPrivateDns(MODE_HOSTNAME);
-        }
-
-        markAlive(false);
-        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE);
-
-        if (workerThread != null) {
-            workerThread.quitSafely();
-        }
-        super.onDestroy();
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    private void scheduleReconcile() {
-        Log.d(TAG, "network event");
-        worker.removeCallbacks(reconcileTask);
-        worker.postDelayed(reconcileTask, SETTLE_MS);
-    }
-
-    private void unregister(ConnectivityManager.NetworkCallback callback) {
+    private void unregister(@Nullable ConnectivityManager.NetworkCallback callback) {
         if (callback == null) {
             return;
         }
@@ -308,161 +288,15 @@ public class DNSService extends Service {
         }
     }
 
-    private static final class Observation {
-        final boolean onWifi;
-        @Nullable
-        final String ssid;
-
-        Observation(boolean onWifi, @Nullable String ssid) {
-            this.onWifi = onWifi;
-            this.ssid = ssid;
-        }
-    }
-
-    /**
-     * What the network layer currently looks like. Two independent sources: the connectivity
-     * stack, and WifiManager - because the callback's capabilities can be redacted while
-     * WifiManager still knows the name.
-     */
-    private Observation observe() {
-        Network wifi = findWifiNetwork();
-        String ssid = wifi == null ? null : currentSsid(wifi);
-
-        if (ssid == null) {
-            String fromWifiManager = ssidFromWifiManager();
-            if (fromWifiManager != null) {
-                return new Observation(true, fromWifiManager);
-            }
-        }
-        return new Observation(wifi != null, ssid);
+    private void scheduleReconcile() {
+        Log.d(TAG, "network event");
+        worker.removeCallbacks(reconcileTask);
+        worker.postDelayed(reconcileTask, SETTLE_MS);
     }
 
     private void reconcile() {
-        Observation seen = observe();
-
-        String homeSsid = prefs.getString(KEY_HOME_SSID, "");
-        SwitchPolicy.State state = SwitchPolicy.decide(homeSsid, prefs.getString(KEY_PRIVATE_DNS, ""),
-                seen.onWifi, seen.ssid);
-
-        // Always on record: an unreadable SSID used to make the service do nothing at all with no
-        // trace anywhere, which is indistinguishable from a service that is not running.
-        Log.i(TAG, "onWifi=" + seen.onWifi + " ssid=" + seen.ssid
-                + " home=" + homeSsid + " -> " + state);
-        prefs.edit()
-                .putString(KEY_LAST_SSID, seen.ssid == null ? "" : seen.ssid)
-                .putString(KEY_LAST_STATE, state.name().toLowerCase(Locale.ROOT))
-                .putLong(KEY_LAST_CHECK, System.currentTimeMillis())
-                .apply();
-
-        String desired = SwitchPolicy.desiredMode(state);
-        if (desired == null) {
-            // Not enough information: leave the current setting alone rather than guess, but the
-            // notification says so instead of looking healthy.
-            Log.w(TAG, "Leaving Private DNS untouched: could not read the Wi-Fi name");
-            updateNotification();
-            return;
-        }
-        applyPrivateDns(desired);
-    }
-
-    @Nullable
-    private Network findWifiNetwork() {
-        if (connectivityManager == null) {
-            return null;
-        }
-
-        Network active = connectivityManager.getActiveNetwork();
-        if (isWifi(active)) {
-            return active;
-        }
-
-        try {
-            for (Network network : connectivityManager.getAllNetworks()) {
-                if (isWifi(network)) {
-                    return network;
-                }
-            }
-        } catch (RuntimeException e) {
-            Log.w(TAG, "Could not enumerate networks", e);
-        }
-        return null;
-    }
-
-    private boolean isWifi(@Nullable Network network) {
-        if (network == null) {
-            return false;
-        }
-        NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(network);
-        return caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
-    }
-
-    @Nullable
-    private String currentSsid(Network network) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            return null;
-        }
-        NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(network);
-        if (caps == null) {
-            return null;
-        }
-        WifiInfo info = (WifiInfo) caps.getTransportInfo();
-        return SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
-    }
-
-    @Nullable
-    private String ssidFromWifiManager() {
-        try {
-            WifiManager wifiManager =
-                    (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (wifiManager == null) {
-                return null;
-            }
-            WifiInfo info = wifiManager.getConnectionInfo();
-            return SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
-        } catch (SecurityException e) {
-            Log.w(TAG, "Cannot read the SSID without the location / nearby Wi-Fi permission", e);
-        }
-        return null;
-    }
-
-    private void applyPrivateDns(String desired) {
-        String hostname = prefs.getString(KEY_PRIVATE_DNS, "");
-
-        try {
-            if (MODE_HOSTNAME.equals(desired)) {
-                if (hostname.isEmpty()) {
-                    return;
-                }
-                // Written independently of the mode: editing the hostname while already in
-                // "hostname" mode used to leave the old provider in place until the next switch.
-                String specifier = Settings.Global.getString(getContentResolver(), SETTING_SPECIFIER);
-                if (SwitchPolicy.providerNeedsWrite(specifier, hostname)) {
-                    Settings.Global.putString(getContentResolver(), SETTING_SPECIFIER, hostname);
-                    Log.i(TAG, "Private DNS provider set to " + hostname);
-                }
-            }
-
-            String current = currentMode();
-            if (SwitchPolicy.modeNeedsWrite(current, desired)) {
-                Settings.Global.putString(getContentResolver(), SETTING_MODE, desired);
-                Log.i(TAG, "Private DNS mode " + current + " -> " + desired);
-            }
-
-            prefs.edit().putString(KEY_LAST_APPLIED, desired).apply();
-        } catch (SecurityException e) {
-            Log.e(TAG, "Missing WRITE_SECURE_SETTINGS; run the adb command from the app", e);
-        }
-
+        Reconciler.evaluate(this);
         updateNotification();
-    }
-
-    private String currentMode() {
-        try {
-            String mode = Settings.Global.getString(getContentResolver(), SETTING_MODE);
-            return mode == null ? MODE_OFF : mode;
-        } catch (SecurityException e) {
-            return MODE_OFF;
-        }
     }
 
     private void markAlive(boolean alive) {
@@ -477,7 +311,7 @@ public class DNSService extends Service {
     }
 
     private String statusText() {
-        if (!hasPermission(this)) {
+        if (!Reconciler.hasPermission(this)) {
             return getString(R.string.notification_missing_permission);
         }
         if (monitoringFailed) {
@@ -487,7 +321,7 @@ public class DNSService extends Service {
                 .equals(prefs.getString(KEY_LAST_STATE, ""))) {
             return getString(R.string.notification_unreadable_ssid);
         }
-        return MODE_HOSTNAME.equals(currentMode())
+        return MODE_HOSTNAME.equals(Reconciler.currentMode(this))
                 ? getString(R.string.notification_away)
                 : getString(R.string.notification_home);
     }
