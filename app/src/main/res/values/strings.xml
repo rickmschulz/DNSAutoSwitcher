@@ -7,9 +7,11 @@
 
     <string name="action_start">Save &amp; Start Service</string>
     <string name="action_stop">Stop Service</string>
+    <string name="action_restart">Restart Service</string>
 
     <string name="status_running">Service running — Private DNS follows your Wi-Fi network.</string>
     <string name="status_stopped">Service stopped.</string>
+    <string name="status_stale">The service is not updating. Android may have stopped it — press Restart.</string>
     <string name="status_missing_permission">Missing permission — follow the steps below.</string>
     <string name="status_missing_wifi_permission">Missing permission to read the Wi-Fi network name. Grant location, or nearby devices on Android 13+.</string>
 
@@ -18,6 +20,7 @@
     <string name="toast_fill_both_fields">Please fill in both fields</string>
     <string name="toast_started">Service started</string>
     <string name="toast_stopped">Service stopped</string>
+    <string name="toast_restarted">Service restarted</string>
     <string name="toast_location_fallback">The app cannot read your Wi-Fi name. Some phones need Location access for that — allow it so the switch can work.</string>
     <string name="toast_background_location">CRITICAL: choose \'Allow all the time\' so the background service can read the Wi-Fi name.</string>
 
@@ -26,8 +29,13 @@
     <string name="notification_home">At home — Private DNS off, local resolver in use</string>
     <string name="notification_away">Away — Private DNS on</string>
     <string name="notification_missing_permission">Missing WRITE_SECURE_SETTINGS — see the app</string>
+    <string name="notification_monitoring_failed">Cannot monitor the network — restart the app</string>
     <string name="notification_unreadable_ssid">Cannot read the Wi-Fi name — check the permissions</string>
 
+    <string name="observed_with_age">%1$s · checked %2$s</string>
+    <string name="age_just_now">just now</string>
+    <string name="age_minutes">%1$d min ago</string>
+    <string name="age_hours">%1$d h ago</string>
     <string name="observed_ssid">Wi-Fi seen: %1$s</string>
     <string name="observed_none">Wi-Fi seen: none (mobile data)</string>
     <string name="observed_unreadable">Wi-Fi seen: unreadable — grant Location (or Nearby devices) access</string>

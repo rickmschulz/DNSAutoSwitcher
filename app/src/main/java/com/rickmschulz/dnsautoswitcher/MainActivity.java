@@ -80,8 +80,12 @@ public class MainActivity extends AppCompatActivity {
         inputDNS.setText(prefs.getString(DNSService.KEY_PRIVATE_DNS, ""));
 
         btnAction.setOnClickListener(v -> {
-            if (isServiceActive()) {
+            if (isServiceActive() && !isServiceStale()) {
                 stopMonitoring();
+            } else if (isServiceSwitchedOn()) {
+                // Enabled but not running: a killed service leaves no trace, so offer a restart
+                // rather than a Stop button that would appear to do nothing.
+                restartMonitoring();
             } else {
                 saveAndStartService();
             }
@@ -203,9 +207,34 @@ public class MainActivity extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    private boolean isServiceSwitchedOn() {
+        return prefs.getBoolean(DNSService.KEY_ENABLED, false);
+    }
+
     private boolean isServiceActive() {
-        return prefs.getBoolean(DNSService.KEY_ENABLED, false)
-                && prefs.getBoolean(DNSService.KEY_ALIVE, false);
+        return isServiceSwitchedOn() && prefs.getBoolean(DNSService.KEY_ALIVE, false);
+    }
+
+    /**
+     * A service killed by the system never runs onDestroy, so "alive" stays set and the screen
+     * would happily claim it is running. The heartbeat written on every evaluation is the real
+     * signal: if it is old, nothing has been evaluated for a while.
+     */
+    private boolean isServiceStale() {
+        if (!isServiceSwitchedOn()) {
+            return false;
+        }
+        long lastCheck = prefs.getLong(DNSService.KEY_LAST_CHECK, 0L);
+        return lastCheck == 0L || System.currentTimeMillis() - lastCheck > DNSService.STALE_MS;
+    }
+
+    private void restartMonitoring() {
+        prefs.edit().putBoolean(DNSService.KEY_ENABLED, true).apply();
+        startForegroundService(new Intent(this, DNSService.class));
+
+        updateUI();
+        btnAction.postDelayed(this::updateUI, 500);
+        Toast.makeText(this, R.string.toast_restarted, Toast.LENGTH_SHORT).show();
     }
 
     private void saveAndStartService() {
@@ -250,7 +279,12 @@ public class MainActivity extends AppCompatActivity {
         boolean canWrite = DNSService.hasPermission(this);
         boolean canReadSsid = hasWifiPermission();
 
-        btnAction.setText(active ? R.string.action_stop : R.string.action_start);
+        boolean stale = isServiceStale();
+        boolean switchedOn = isServiceSwitchedOn();
+
+        btnAction.setText(active && !stale ? R.string.action_stop
+                : switchedOn ? R.string.action_restart
+                : R.string.action_start);
         ViewCompat.setBackgroundTintList(btnAction, ColorStateList.valueOf(
                 ContextCompat.getColor(this, active ? R.color.state_active : R.color.state_idle)));
         // Without the ADB permission nothing the service does can work, so do not pretend it can.
@@ -267,6 +301,9 @@ public class MainActivity extends AppCompatActivity {
             textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
         } else if (!canReadSsid) {
             textStatus.setText(R.string.status_missing_wifi_permission);
+            textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
+        } else if (stale) {
+            textStatus.setText(R.string.status_stale);
             textStatus.setTextColor(ContextCompat.getColor(this, R.color.state_active));
         } else {
             textStatus.setText(active ? R.string.status_running : R.string.status_stopped);

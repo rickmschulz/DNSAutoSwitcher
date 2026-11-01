@@ -60,6 +60,8 @@ public class DNSService extends Service {
     /** What the last evaluation actually saw, so "it did nothing" is never invisible. */
     static final String KEY_LAST_SSID = "last_seen_ssid";
     static final String KEY_LAST_STATE = "last_state";
+    /** When the last evaluation ran: a stale value means events stopped arriving. */
+    static final String KEY_LAST_CHECK = "last_check_millis";
 
     static final String ACTION_STOP = "com.rickmschulz.dnsautoswitcher.action.STOP";
 
@@ -76,12 +78,38 @@ public class DNSService extends Service {
     /** Network callbacks arrive in bursts; wait until the connection has settled. */
     private static final long SETTLE_MS = 900L;
 
+    /**
+     * A cheap periodic re-check. Callbacks are the mechanism, but an OEM power manager that
+     * freezes a background service silently stops them, and then the app looks alive while
+     * switching nothing. Two minutes of a binder call is nothing next to being wrong.
+     */
+    private static final long SAFETY_NET_MS = 120_000L;
+
+    /**
+     * A service can be killed without onDestroy running, which would otherwise leave "alive" set
+     * forever. The heartbeat is written on every evaluation, so an old one means it is not running.
+     */
+    static final long STALE_MS = 10 * 60 * 1000L;
+
     private ConnectivityManager connectivityManager;
     private SharedPreferences prefs;
     private HandlerThread workerThread;
     private Handler worker;
     private ConnectivityManager.NetworkCallback networkCallback;
+    private ConnectivityManager.NetworkCallback defaultCallback;
     private Runnable reconcileTask;
+    private final Runnable safetyNet = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "safety check");
+            if (worker != null) {
+                worker.postDelayed(this, SAFETY_NET_MS);
+            }
+            scheduleReconcile();
+        }
+    };
+    /** Set when no network subscription could be established at all. */
+    private boolean monitoringFailed;
 
     /**
      * True when the app may write Settings.Global. Granted once over ADB; a plain runtime request
@@ -98,6 +126,7 @@ public class DNSService extends Service {
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        Log.i(TAG, "onCreate");
         createNotificationChannel();
         startForeground(NOTIFICATION_ID, buildNotification(statusText()));
         markAlive(true);
@@ -114,67 +143,109 @@ public class DNSService extends Service {
         // FLAG_INCLUDE_LOCATION_INFO is what makes the SSID readable from the callback's
         // NetworkCapabilities on Android 12 and newer. Without it getSSID() reports
         // "<unknown ssid>" even with every permission granted, and the switch never happens.
-        // (The int constructor only exists from API 31, hence the two shapes.)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            networkCallback = new ConnectivityManager.NetworkCallback(
-                    ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO) {
-                @Override
-                public void onAvailable(Network network) {
-                    scheduleReconcile();
-                }
+        // The int constructor only exists from API 31, and a few builds refuse the flagged
+        // subscription outright, so fall back to the plain one instead of monitoring nothing.
+        networkCallback = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                ? locationCallback()
+                : plainCallback();
 
-                @Override
-                public void onLost(Network network) {
-                    scheduleReconcile();
-                }
-
-                @Override
-                public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) {
-                    scheduleReconcile();
-                }
-
-                @Override
-                public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
-                    scheduleReconcile();
-                }
-            };
-        } else {
-            networkCallback = new ConnectivityManager.NetworkCallback() {
-                @Override
-                public void onAvailable(Network network) {
-                    scheduleReconcile();
-                }
-
-                @Override
-                public void onLost(Network network) {
-                    scheduleReconcile();
-                }
-
-                @Override
-                public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) {
-                    scheduleReconcile();
-                }
-
-                @Override
-                public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
-                    scheduleReconcile();
-                }
-            };
+        if (!registerWifiCallback(request)) {
+            Log.w(TAG, "Retrying the Wi-Fi registration without the location flag");
+            networkCallback = plainCallback();
+            if (!registerWifiCallback(request)) {
+                monitoringFailed = true;
+                Log.e(TAG, "No network callback could be registered; relying on the 2 minute check");
+            }
         }
 
+        // A second subscription with no transport filter: it fires for handovers between mobile
+        // data and Wi-Fi, so a change is seen even if the Wi-Fi registration is the one that broke.
+        defaultCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                scheduleReconcile();
+            }
+
+            @Override
+            public void onLost(Network network) {
+                scheduleReconcile();
+            }
+        };
         try {
-            // Delivering on the worker keeps the binder calls to Settings off the main thread.
-            connectivityManager.registerNetworkCallback(request, networkCallback, worker);
+            connectivityManager.registerDefaultNetworkCallback(defaultCallback, worker);
         } catch (RuntimeException e) {
-            Log.e(TAG, "Could not register the network callback", e);
+            Log.e(TAG, "Could not register the default network callback", e);
         }
 
         // Apply the right state straight away instead of waiting for the next network change.
         worker.post(reconcileTask);
+        worker.postDelayed(safetyNet, SAFETY_NET_MS);
+    }
+
+    private ConnectivityManager.NetworkCallback locationCallback() {
+        return new ConnectivityManager.NetworkCallback(
+                ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO) {
+            @Override
+            public void onAvailable(Network network) {
+                scheduleReconcile();
+            }
+
+            @Override
+            public void onLost(Network network) {
+                scheduleReconcile();
+            }
+
+            @Override
+            public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) {
+                scheduleReconcile();
+            }
+
+            @Override
+            public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
+                scheduleReconcile();
+            }
+        };
+    }
+
+    private ConnectivityManager.NetworkCallback plainCallback() {
+        return new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                scheduleReconcile();
+            }
+
+            @Override
+            public void onLost(Network network) {
+                scheduleReconcile();
+            }
+
+            @Override
+            public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) {
+                scheduleReconcile();
+            }
+
+            @Override
+            public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
+                scheduleReconcile();
+            }
+        };
+    }
+
+    private boolean registerWifiCallback(NetworkRequest request) {
+        try {
+            // Delivering on the worker keeps the binder calls to Settings off the main thread.
+            connectivityManager.registerNetworkCallback(request, networkCallback, worker);
+            Log.i(TAG, "Wi-Fi network callback registered");
+            return true;
+        } catch (RuntimeException e) {
+            Log.e(TAG, "Could not register the Wi-Fi network callback", e);
+            return false;
+        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "onStartCommand action=" + (intent == null ? "null" : intent.getAction()));
         if (intent != null && ACTION_STOP.equals(intent.getAction())) {
             prefs.edit().putBoolean(KEY_ENABLED, false).apply();
             stopSelf();
@@ -185,16 +256,17 @@ public class DNSService extends Service {
 
     @Override
     public void onDestroy() {
-        if (connectivityManager != null && networkCallback != null) {
-            try {
-                connectivityManager.unregisterNetworkCallback(networkCallback);
-            } catch (IllegalArgumentException ignored) {
-                // Already unregistered.
-            }
+        Log.i(TAG, "onDestroy");
+        if (connectivityManager != null) {
+            unregister(networkCallback);
+            unregister(defaultCallback);
         }
 
-        if (worker != null && reconcileTask != null) {
-            worker.removeCallbacks(reconcileTask);
+        if (worker != null) {
+            if (reconcileTask != null) {
+                worker.removeCallbacks(reconcileTask);
+            }
+            worker.removeCallbacks(safetyNet);
         }
 
         // Never leave the device with Private DNS disabled: if we were the one that turned it off,
@@ -220,25 +292,66 @@ public class DNSService extends Service {
     }
 
     private void scheduleReconcile() {
+        Log.d(TAG, "network event");
         worker.removeCallbacks(reconcileTask);
         worker.postDelayed(reconcileTask, SETTLE_MS);
     }
 
-    private void reconcile() {
+    private void unregister(ConnectivityManager.NetworkCallback callback) {
+        if (callback == null) {
+            return;
+        }
+        try {
+            connectivityManager.unregisterNetworkCallback(callback);
+        } catch (IllegalArgumentException ignored) {
+            // Already unregistered.
+        }
+    }
+
+    private static final class Observation {
+        final boolean onWifi;
+        @Nullable
+        final String ssid;
+
+        Observation(boolean onWifi, @Nullable String ssid) {
+            this.onWifi = onWifi;
+            this.ssid = ssid;
+        }
+    }
+
+    /**
+     * What the network layer currently looks like. Two independent sources: the connectivity
+     * stack, and WifiManager - because the callback's capabilities can be redacted while
+     * WifiManager still knows the name.
+     */
+    private Observation observe() {
         Network wifi = findWifiNetwork();
         String ssid = wifi == null ? null : currentSsid(wifi);
 
+        if (ssid == null) {
+            String fromWifiManager = ssidFromWifiManager();
+            if (fromWifiManager != null) {
+                return new Observation(true, fromWifiManager);
+            }
+        }
+        return new Observation(wifi != null, ssid);
+    }
+
+    private void reconcile() {
+        Observation seen = observe();
+
         String homeSsid = prefs.getString(KEY_HOME_SSID, "");
         SwitchPolicy.State state = SwitchPolicy.decide(homeSsid, prefs.getString(KEY_PRIVATE_DNS, ""),
-                wifi != null, ssid);
+                seen.onWifi, seen.ssid);
 
         // Always on record: an unreadable SSID used to make the service do nothing at all with no
         // trace anywhere, which is indistinguishable from a service that is not running.
-        Log.i(TAG, "wifi=" + (wifi != null) + " ssid=" + ssid
+        Log.i(TAG, "onWifi=" + seen.onWifi + " ssid=" + seen.ssid
                 + " home=" + homeSsid + " -> " + state);
         prefs.edit()
-                .putString(KEY_LAST_SSID, ssid == null ? "" : ssid)
+                .putString(KEY_LAST_SSID, seen.ssid == null ? "" : seen.ssid)
                 .putString(KEY_LAST_STATE, state.name().toLowerCase(Locale.ROOT))
+                .putLong(KEY_LAST_CHECK, System.currentTimeMillis())
                 .apply();
 
         String desired = SwitchPolicy.desiredMode(state);
@@ -257,34 +370,55 @@ public class DNSService extends Service {
         if (connectivityManager == null) {
             return null;
         }
-        for (Network network : connectivityManager.getAllNetworks()) {
-            NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(network);
-            if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                return network;
+
+        Network active = connectivityManager.getActiveNetwork();
+        if (isWifi(active)) {
+            return active;
+        }
+
+        try {
+            for (Network network : connectivityManager.getAllNetworks()) {
+                if (isWifi(network)) {
+                    return network;
+                }
             }
+        } catch (RuntimeException e) {
+            Log.w(TAG, "Could not enumerate networks", e);
         }
         return null;
     }
 
+    private boolean isWifi(@Nullable Network network) {
+        if (network == null) {
+            return false;
+        }
+        NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(network);
+        return caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+    }
+
     @Nullable
     private String currentSsid(Network network) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(network);
-            if (caps != null) {
-                WifiInfo info = (WifiInfo) caps.getTransportInfo();
-                String ssid = SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
-                if (ssid != null) {
-                    return ssid;
-                }
-            }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            return null;
         }
+        NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(network);
+        if (caps == null) {
+            return null;
+        }
+        WifiInfo info = (WifiInfo) caps.getTransportInfo();
+        return SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
+    }
 
+    @Nullable
+    private String ssidFromWifiManager() {
         try {
             WifiManager wifiManager =
                     (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (wifiManager != null) {
-                return SwitchPolicy.normalizeSsid(wifiManager.getConnectionInfo().getSSID());
+            if (wifiManager == null) {
+                return null;
             }
+            WifiInfo info = wifiManager.getConnectionInfo();
+            return SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
         } catch (SecurityException e) {
             Log.w(TAG, "Cannot read the SSID without the location / nearby Wi-Fi permission", e);
         }
@@ -345,6 +479,9 @@ public class DNSService extends Service {
     private String statusText() {
         if (!hasPermission(this)) {
             return getString(R.string.notification_missing_permission);
+        }
+        if (monitoringFailed) {
+            return getString(R.string.notification_monitoring_failed);
         }
         if (SwitchPolicy.State.UNKNOWN.name().toLowerCase(Locale.ROOT)
                 .equals(prefs.getString(KEY_LAST_STATE, ""))) {
