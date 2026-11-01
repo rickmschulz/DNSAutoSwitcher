@@ -41,6 +41,9 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <!-- An app update kills the process. Without this the service stays dead until the
+                     next reboot, which is especially visible when updating through Obtainium. -->
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
 

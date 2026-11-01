@@ -5,15 +5,18 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.pm.PackageInfoCompat;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         inputSSID = findViewById(R.id.input_ssid);
         inputDNS = findViewById(R.id.input_dns_id);
         btnAction = findViewById(R.id.btn_save);
+        TextView textVersion = findViewById(R.id.text_version);
+        textVersion.setText(getString(R.string.version_label, getVersionName(), getVersionCodeLong()));
 
         prefs = getSharedPreferences("DNSAutoSwitcherPrefs", MODE_PRIVATE);
         inputSSID.setText(prefs.getString("home_ssid", ""));
@@ -47,6 +52,28 @@ public class MainActivity extends AppCompatActivity {
                 saveAndStartService();
             }
         });
+    }
+
+    /**
+     * Read from the installed package rather than BuildConfig, so the label always matches the
+     * APK that is actually running - which is the whole point of showing it.
+     */
+    private String getVersionName() {
+        PackageInfo info = installedPackage();
+        return info == null ? "?" : String.valueOf(info.versionName);
+    }
+
+    private long getVersionCodeLong() {
+        PackageInfo info = installedPackage();
+        return info == null ? 0L : PackageInfoCompat.getLongVersionCode(info);
+    }
+
+    private PackageInfo installedPackage() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        }
     }
 
     private void requestRequiredPermissions() {
