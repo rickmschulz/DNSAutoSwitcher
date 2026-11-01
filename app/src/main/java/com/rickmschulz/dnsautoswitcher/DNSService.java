@@ -21,12 +21,15 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
+
+import java.util.Locale;
 
 /**
  * Keeps Private DNS in the state that matches the current Wi-Fi network.
@@ -54,6 +57,9 @@ public class DNSService extends Service {
     static final String KEY_ALIVE = "service_alive";
     /** The mode this service last wrote, so stopping it can undo its own change only. */
     static final String KEY_LAST_APPLIED = "last_applied_mode";
+    /** What the last evaluation actually saw, so "it did nothing" is never invisible. */
+    static final String KEY_LAST_SSID = "last_seen_ssid";
+    static final String KEY_LAST_STATE = "last_state";
 
     static final String ACTION_STOP = "com.rickmschulz.dnsautoswitcher.action.STOP";
 
@@ -105,27 +111,56 @@ public class DNSService extends Service {
                 .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
                 .build();
 
-        networkCallback = new ConnectivityManager.NetworkCallback() {
-            @Override
-            public void onAvailable(Network network) {
-                scheduleReconcile();
-            }
+        // FLAG_INCLUDE_LOCATION_INFO is what makes the SSID readable from the callback's
+        // NetworkCapabilities on Android 12 and newer. Without it getSSID() reports
+        // "<unknown ssid>" even with every permission granted, and the switch never happens.
+        // (The int constructor only exists from API 31, hence the two shapes.)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            networkCallback = new ConnectivityManager.NetworkCallback(
+                    ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO) {
+                @Override
+                public void onAvailable(Network network) {
+                    scheduleReconcile();
+                }
 
-            @Override
-            public void onLost(Network network) {
-                scheduleReconcile();
-            }
+                @Override
+                public void onLost(Network network) {
+                    scheduleReconcile();
+                }
 
-            @Override
-            public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) {
-                scheduleReconcile();
-            }
+                @Override
+                public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) {
+                    scheduleReconcile();
+                }
 
-            @Override
-            public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
-                scheduleReconcile();
-            }
-        };
+                @Override
+                public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
+                    scheduleReconcile();
+                }
+            };
+        } else {
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    scheduleReconcile();
+                }
+
+                @Override
+                public void onLost(Network network) {
+                    scheduleReconcile();
+                }
+
+                @Override
+                public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) {
+                    scheduleReconcile();
+                }
+
+                @Override
+                public void onLinkPropertiesChanged(Network network, LinkProperties linkProperties) {
+                    scheduleReconcile();
+                }
+            };
+        }
 
         try {
             // Delivering on the worker keeps the binder calls to Settings off the main thread.
@@ -193,15 +228,25 @@ public class DNSService extends Service {
         Network wifi = findWifiNetwork();
         String ssid = wifi == null ? null : currentSsid(wifi);
 
-        String desired = SwitchPolicy.desiredMode(SwitchPolicy.decide(
-                prefs.getString(KEY_HOME_SSID, ""),
-                prefs.getString(KEY_PRIVATE_DNS, ""),
-                wifi != null,
-                ssid));
+        String homeSsid = prefs.getString(KEY_HOME_SSID, "");
+        SwitchPolicy.State state = SwitchPolicy.decide(homeSsid, prefs.getString(KEY_PRIVATE_DNS, ""),
+                wifi != null, ssid);
 
+        // Always on record: an unreadable SSID used to make the service do nothing at all with no
+        // trace anywhere, which is indistinguishable from a service that is not running.
+        Log.i(TAG, "wifi=" + (wifi != null) + " ssid=" + ssid
+                + " home=" + homeSsid + " -> " + state);
+        prefs.edit()
+                .putString(KEY_LAST_SSID, ssid == null ? "" : ssid)
+                .putString(KEY_LAST_STATE, state.name().toLowerCase(Locale.ROOT))
+                .apply();
+
+        String desired = SwitchPolicy.desiredMode(state);
         if (desired == null) {
-            // Not enough information (no Wi-Fi yet, SSID unreadable, nothing configured):
-            // leave the current setting alone rather than guess and disable filtering.
+            // Not enough information: leave the current setting alone rather than guess, but the
+            // notification says so instead of looking healthy.
+            Log.w(TAG, "Leaving Private DNS untouched: could not read the Wi-Fi name");
+            updateNotification();
             return;
         }
         applyPrivateDns(desired);
@@ -300,6 +345,10 @@ public class DNSService extends Service {
     private String statusText() {
         if (!hasPermission(this)) {
             return getString(R.string.notification_missing_permission);
+        }
+        if (SwitchPolicy.State.UNKNOWN.name().toLowerCase(Locale.ROOT)
+                .equals(prefs.getString(KEY_LAST_STATE, ""))) {
+            return getString(R.string.notification_unreadable_ssid);
         }
         return MODE_HOSTNAME.equals(currentMode())
                 ? getString(R.string.notification_away)

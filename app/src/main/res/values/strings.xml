@@ -18,6 +18,7 @@
     <string name="toast_fill_both_fields">Please fill in both fields</string>
     <string name="toast_started">Service started</string>
     <string name="toast_stopped">Service stopped</string>
+    <string name="toast_location_fallback">The app cannot read your Wi-Fi name. Some phones need Location access for that — allow it so the switch can work.</string>
     <string name="toast_background_location">CRITICAL: choose \'Allow all the time\' so the background service can read the Wi-Fi name.</string>
 
     <string name="notification_channel_name">Private DNS switching</string>
@@ -25,5 +26,10 @@
     <string name="notification_home">At home — Private DNS off, local resolver in use</string>
     <string name="notification_away">Away — Private DNS on</string>
     <string name="notification_missing_permission">Missing WRITE_SECURE_SETTINGS — see the app</string>
+    <string name="notification_unreadable_ssid">Cannot read the Wi-Fi name — check the permissions</string>
+
+    <string name="observed_ssid">Wi-Fi seen: %1$s</string>
+    <string name="observed_none">Wi-Fi seen: none (mobile data)</string>
+    <string name="observed_unreadable">Wi-Fi seen: unreadable — grant Location (or Nearby devices) access</string>
     <string name="notification_action_stop">Stop</string>
 </resources>

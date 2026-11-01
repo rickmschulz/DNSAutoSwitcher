@@ -51,6 +51,17 @@
         tools:text="Service running" />
 
     <TextView
+        android:id="@+id/text_observed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="@color/state_muted"
+        android:textSize="12sp"
+        tools:text="Wi-Fi seen: HomeNet" />
+
+    <TextView
         android:id="@+id/text_help"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

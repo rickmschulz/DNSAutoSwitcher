@@ -15,17 +15,17 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!--
-      Reading the SSID: Android 13+ gates it behind NEARBY_WIFI_DEVICES, a normal runtime
-      permission with no "allow all the time" step. Location is only needed up to Android 12
-      (and background location only because the service reads the SSID while in the background),
-      so it is capped rather than requested on every device.
+      Reading the SSID. Android 13+ uses NEARBY_WIFI_DEVICES; location is what Android 12 and
+      older require, and some OEM builds (MIUI, HyperOS) still redact the SSID without it even on
+      newer versions - so it stays declared everywhere, not capped. Background location is needed
+      because the service reads the SSID while in the background.
     -->
     <uses-permission
         android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:allowBackup="true"

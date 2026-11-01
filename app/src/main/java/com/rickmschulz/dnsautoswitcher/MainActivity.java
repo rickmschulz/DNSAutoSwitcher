@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private TextInputEditText inputDNS;
     private Button btnAction;
     private TextView textStatus;
+    private TextView textObserved;
     private TextView textHelp;
     private SharedPreferences prefs;
 
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
     /** Asking for background location repeatedly on every resume is pure nagging. */
     private boolean backgroundLocationAsked;
+    /** Only asked for when the SSID really turns out to be unreadable. */
+    private boolean locationFallbackAsked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         inputDNS = findViewById(R.id.input_dns_id);
         btnAction = findViewById(R.id.btn_save);
         textStatus = findViewById(R.id.text_status);
+        textObserved = findViewById(R.id.text_observed);
         textHelp = findViewById(R.id.text_help);
 
         TextView textVersion = findViewById(R.id.text_version);
@@ -144,6 +148,22 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Android 13+ should be satisfied by NEARBY_WIFI_DEVICES, but several OEM builds still
+        // redact the SSID without location. Ask for it only when the service reports that it
+        // cannot read the name, and only once, instead of putting a location prompt in everyone's
+        // way on first launch.
+        if (!locationFallbackAsked
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && "unknown".equals(prefs.getString(DNSService.KEY_LAST_STATE, ""))) {
+            locationFallbackAsked = true;
+            Toast.makeText(this, R.string.toast_location_fallback, Toast.LENGTH_LONG).show();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_WIFI);
+            return;
+        }
+
         // Up to Android 12 the SSID is only readable in the background with background location.
         if (!backgroundLocationAsked
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
@@ -169,11 +189,18 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+    /**
+     * Android 13+ normally gates the SSID behind NEARBY_WIFI_DEVICES, but some OEM builds still
+     * redact it without location, so either one counts as "we have a way in".
+     */
     private boolean hasWifiPermission() {
-        String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                ? Manifest.permission.NEARBY_WIFI_DEVICES
-                : Manifest.permission.ACCESS_FINE_LOCATION;
-        return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES)
+                == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean isServiceActive() {
@@ -245,6 +272,34 @@ public class MainActivity extends AppCompatActivity {
             textStatus.setText(active ? R.string.status_running : R.string.status_stopped);
             textStatus.setTextColor(ContextCompat.getColor(this,
                     active ? R.color.state_idle : R.color.state_muted));
+        }
+
+        showWhatTheServiceSees(active);
+    }
+
+    /**
+     * The service can decide to do nothing - for instance when Android will not reveal the Wi-Fi
+     * name - and "nothing happened" is impossible to tell apart from "the service is dead". This
+     * line says which network was seen, so that case is visible instead of silent.
+     */
+    private void showWhatTheServiceSees(boolean active) {
+        textObserved.setVisibility(active ? View.VISIBLE : View.GONE);
+        if (!active) {
+            return;
+        }
+
+        String ssid = prefs.getString(DNSService.KEY_LAST_SSID, "");
+        String state = prefs.getString(DNSService.KEY_LAST_STATE, "");
+
+        if ("unknown".equals(state)) {
+            textObserved.setText(R.string.observed_unreadable);
+            textObserved.setTextColor(ContextCompat.getColor(this, R.color.state_active));
+        } else if (ssid.isEmpty()) {
+            textObserved.setText(R.string.observed_none);
+            textObserved.setTextColor(ContextCompat.getColor(this, R.color.state_muted));
+        } else {
+            textObserved.setText(getString(R.string.observed_ssid, ssid));
+            textObserved.setTextColor(ContextCompat.getColor(this, R.color.state_muted));
         }
     }
 }
