@@ -86,7 +86,7 @@ Skipping this is what made v1.1 report itself as 1.0, and made updaters such as 
 
 ## Changelog
 
-**Unreleased**
+**v1.2**
 * **Fixed:** the version now comes from the git tag instead of being edited by hand, and is shown inside the app.
 * **Fixed:** the service restarts after an app update, not only after a reboot.
 * **Fixed:** an unknown SSID no longer disables Private DNS while at home.
@@ -94,6 +94,7 @@ Skipping this is what made v1.1 report itself as 1.0, and made updaters such as 
 * **Fixed:** stopping the service restores Private DNS instead of leaving it off.
 * **Changed:** fewer permissions on Android 13+, a state line and Stop action in the notification, and a release build that is minified.
 * **Changed:** the ADB instructions disappear from the app once the permission is granted.
+* **Docs:** the README explains that MIUI and HyperOS need "USB debugging (Security settings)" enabled before `pm grant` is accepted.
 
 **v1.1**
 * **Fixed:** The app was only partially working as intended. This release fixes the underlying issues and restores full functionality.
