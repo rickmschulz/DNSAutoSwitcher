@@ -1,8 +1,6 @@
 package com.rickmschulz.dnsautoswitcher;
 
 import android.Manifest;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -13,18 +11,29 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.pm.PackageInfoCompat;
+
 import com.google.android.material.textfield.TextInputEditText;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_NOTIFICATIONS = 101;
+    private static final int REQUEST_WIFI = 102;
+    private static final int REQUEST_BACKGROUND_LOCATION = 103;
+
     private TextInputEditText inputSSID;
     private TextInputEditText inputDNS;
     private Button btnAction;
+    private TextView textStatus;
     private SharedPreferences prefs;
+
+    /** Asking for background location repeatedly on every resume is pure nagging. */
+    private boolean backgroundLocationAsked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,24 +43,36 @@ public class MainActivity extends AppCompatActivity {
         inputSSID = findViewById(R.id.input_ssid);
         inputDNS = findViewById(R.id.input_dns_id);
         btnAction = findViewById(R.id.btn_save);
+        textStatus = findViewById(R.id.text_status);
+
         TextView textVersion = findViewById(R.id.text_version);
         textVersion.setText(getString(R.string.version_label, getVersionName(), getVersionCodeLong()));
 
-        prefs = getSharedPreferences("DNSAutoSwitcherPrefs", MODE_PRIVATE);
-        inputSSID.setText(prefs.getString("home_ssid", ""));
-        inputDNS.setText(prefs.getString("privatedns_id", ""));
-
-        requestRequiredPermissions();
-        syncServiceState();
-        updateUI();
+        prefs = getSharedPreferences(DNSService.PREFS, MODE_PRIVATE);
+        inputSSID.setText(prefs.getString(DNSService.KEY_HOME_SSID, ""));
+        inputDNS.setText(prefs.getString(DNSService.KEY_PRIVATE_DNS, ""));
 
         btnAction.setOnClickListener(v -> {
-            if (DNSService.isRunning) {
-                stopService();
+            if (isServiceActive()) {
+                stopMonitoring();
             } else {
                 saveAndStartService();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        requestRequiredPermissions();
+        updateUI();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        updateUI();
     }
 
     /**
@@ -68,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         return info == null ? 0L : PackageInfoCompat.getLongVersionCode(info);
     }
 
+    @SuppressWarnings("deprecation") // getPackageInfo(String, int) is the only form below API 33
     private PackageInfo installedPackage() {
         try {
             return getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -77,100 +99,104 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestRequiredPermissions() {
-        // Step 1: Request Notifications (Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 102);
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_NOTIFICATIONS);
+            return;
         }
 
-        // Step 2: Request Foreground Location
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (!hasWifiPermission()) {
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
-            }, 101);
-        } else {
-            // Step 3: Request Background Location (Android 10+)
-            // This is ONLY triggered if Foreground Location is already granted
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "CRITICAL: You must select 'Allow all the time' for the background service to read the Wi-Fi name.", Toast.LENGTH_LONG).show();
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 103);
-                }
-            }
+            }, REQUEST_WIFI);
+            return;
+        }
+
+        // From Android 10 the SSID is only readable in the background with background location.
+        if (!backgroundLocationAsked
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            backgroundLocationAsked = true;
+            Toast.makeText(this, R.string.toast_background_location, Toast.LENGTH_LONG).show();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION},
+                    REQUEST_BACKGROUND_LOCATION);
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        syncServiceState();
-        updateUI();
-
-        // Re-check permissions when returning to the app to trigger the background request
-        // if the foreground request was just granted.
-        requestRequiredPermissions();
+    private boolean hasWifiPermission() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void syncServiceState() {
-        boolean actuallyRunning = false;
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (DNSService.class.getName().equals(service.service.getClassName())) {
-                actuallyRunning = true;
-                break;
-            }
-        }
-        DNSService.isRunning = actuallyRunning;
+    private boolean isServiceActive() {
+        return prefs.getBoolean(DNSService.KEY_ENABLED, false)
+                && prefs.getBoolean(DNSService.KEY_ALIVE, false);
     }
 
     private void saveAndStartService() {
-        String ssid = inputSSID.getText().toString().trim();
-        String dnsId = inputDNS.getText().toString().trim();
+        if (!DNSService.hasPermission(this)) {
+            updateUI();
+            return;
+        }
+
+        String ssid = inputSSID.getText() == null ? "" : inputSSID.getText().toString().trim();
+        String dnsId = inputDNS.getText() == null ? "" : inputDNS.getText().toString().trim();
 
         if (ssid.isEmpty() || dnsId.isEmpty()) {
-            Toast.makeText(this, "Please fill in both fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_fill_both_fields, Toast.LENGTH_SHORT).show();
             return;
         }
 
         prefs.edit()
-                .putString("home_ssid", ssid)
-                .putString("privatedns_id", dnsId)
+                .putString(DNSService.KEY_HOME_SSID, ssid)
+                .putString(DNSService.KEY_PRIVATE_DNS, dnsId)
+                .putBoolean(DNSService.KEY_ENABLED, true)
                 .apply();
 
-        Intent serviceIntent = new Intent(this, DNSService.class);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else {
-            startService(serviceIntent);
-        }
+        startForegroundService(new Intent(this, DNSService.class));
 
-        DNSService.isRunning = true;
         updateUI();
-        Toast.makeText(this, "Service Started!", Toast.LENGTH_SHORT).show();
+        // The service reports itself alive from its own onCreate, which runs after this handler.
+        btnAction.postDelayed(this::updateUI, 500);
+        Toast.makeText(this, R.string.toast_started, Toast.LENGTH_SHORT).show();
     }
 
-    private void stopService() {
-        Intent serviceIntent = new Intent(this, DNSService.class);
-        stopService(serviceIntent);
+    private void stopMonitoring() {
+        prefs.edit().putBoolean(DNSService.KEY_ENABLED, false).apply();
+        stopService(new Intent(this, DNSService.class));
 
-        DNSService.isRunning = false;
         updateUI();
-        Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show();
+        btnAction.postDelayed(this::updateUI, 500);
+        Toast.makeText(this, R.string.toast_stopped, Toast.LENGTH_SHORT).show();
     }
 
     private void updateUI() {
-        if (DNSService.isRunning) {
-            btnAction.setText("STOP SERVICE");
-            btnAction.setBackgroundColor(Color.parseColor("#D32F2F")); // Red
-            inputSSID.setEnabled(false);
-            inputDNS.setEnabled(false);
+        boolean active = isServiceActive();
+        boolean canWrite = DNSService.hasPermission(this);
+        boolean canReadSsid = hasWifiPermission();
+
+        btnAction.setText(active ? R.string.action_stop : R.string.action_start);
+        btnAction.setBackgroundColor(Color.parseColor(active ? "#D32F2F" : "#1976D2"));
+        // Without the ADB permission nothing the service does can work, so do not pretend it can.
+        btnAction.setEnabled(canWrite);
+        inputSSID.setEnabled(!active);
+        inputDNS.setEnabled(!active);
+
+        if (!canWrite) {
+            textStatus.setText(R.string.status_missing_permission);
+            textStatus.setTextColor(Color.parseColor("#D32F2F"));
+        } else if (!canReadSsid) {
+            textStatus.setText(R.string.status_missing_wifi_permission);
+            textStatus.setTextColor(Color.parseColor("#D32F2F"));
         } else {
-            btnAction.setText("SAVE & START SERVICE");
-            btnAction.setBackgroundColor(Color.parseColor("#1976D2")); // Blue
-            inputSSID.setEnabled(true);
-            inputDNS.setEnabled(true);
+            textStatus.setText(active ? R.string.status_running : R.string.status_stopped);
+            textStatus.setTextColor(Color.parseColor(active ? "#1976D2" : "#666666"));
         }
     }
 }

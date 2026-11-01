@@ -1,4 +1,24 @@
 <resources>
     <string name="app_name">DNSAutoSwitcher</string>
     <string name="version_label">Version %1$s (%2$d)</string>
+
+    <string name="action_start">Save &amp; Start Service</string>
+    <string name="action_stop">Stop Service</string>
+
+    <string name="status_running">Service running — Private DNS follows your Wi-Fi network.</string>
+    <string name="status_stopped">Service stopped.</string>
+    <string name="status_missing_permission">Missing permission. Connect the phone and run:\n\nadb shell pm grant com.rickmschulz.dnsautoswitcher android.permission.WRITE_SECURE_SETTINGS</string>
+    <string name="status_missing_wifi_permission">Missing permission to read the Wi-Fi network name. Grant location (or nearby devices) access.</string>
+
+    <string name="toast_fill_both_fields">Please fill in both fields</string>
+    <string name="toast_started">Service started</string>
+    <string name="toast_stopped">Service stopped</string>
+    <string name="toast_background_location">CRITICAL: choose \'Allow all the time\' so the background service can read the Wi-Fi name.</string>
+
+    <string name="notification_channel_name">Private DNS switching</string>
+    <string name="notification_channel_description">Shows which state Private DNS is in.</string>
+    <string name="notification_home">At home — Private DNS off, local resolver in use</string>
+    <string name="notification_away">Away — Private DNS on</string>
+    <string name="notification_missing_permission">Missing WRITE_SECURE_SETTINGS — see the app</string>
+    <string name="notification_action_stop">Stop</string>
 </resources>
