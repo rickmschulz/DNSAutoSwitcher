@@ -3,8 +3,8 @@
 # min_api: 28
 # common_typos_disable
 # {"id":"com.android.tools.r8.mapping","version":"2.2"}
-# pg_map_id: b3b8d922f951aa26206e86ebf6c0a993044e158822a4e0ca1d8f919ff77acbf8
-# pg_map_hash: SHA-256 b3b8d922f951aa26206e86ebf6c0a993044e158822a4e0ca1d8f919ff77acbf8
+# pg_map_id: 0f9676b1fd6e4e22768b3278f10900176786e728ddc82987c98cb38fcfbfe8d4
+# pg_map_hash: SHA-256 0f9676b1fd6e4e22768b3278f10900176786e728ddc82987c98cb38fcfbfe8d4
 android.support.v4.app.RemoteActionCompatParcelizer -> android.support.v4.app.RemoteActionCompatParcelizer:
 # {"id":"sourceFile","fileName":"RemoteActionCompatParcelizer.java"}
     1:4:void <init>():11:11 -> <init>
@@ -47080,45 +47080,53 @@ androidx.core.widget.EdgeEffectCompat -> uc:
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroid/content/Context;)Lh6;"}
     9:15:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):289:289 -> X
     9:15:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
-    16:21:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):293:293 -> X
-    16:21:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
-    22:27:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):314:314 -> X
-    22:27:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):294 -> X
-    22:27:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
-    28:33:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):315:315 -> X
-    28:33:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):294 -> X
-    28:33:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
-    34:45:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):299:299 -> X
-    34:45:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
-    46:51:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):314:314 -> X
-    46:51:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):300 -> X
-    46:51:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
-    52:68:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):315:315 -> X
-    52:68:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):300 -> X
-    52:68:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
-    69:76:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):305:305 -> X
-    69:76:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
-    77:84:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromCapabilities(android.net.ConnectivityManager,android.net.Network):319:319 -> X
-    77:84:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):188 -> X
-    85:94:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromCapabilities(android.net.ConnectivityManager,android.net.Network):323:323 -> X
-    85:94:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):188 -> X
-    95:104:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromCapabilities(android.net.ConnectivityManager,android.net.Network):324:324 -> X
-    95:104:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):188 -> X
-    105:110:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):191:191 -> X
-    111:124:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):331:331 -> X
-    111:124:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
-    125:130:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):332:332 -> X
-    125:130:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
-    131:136:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):335:335 -> X
-    131:136:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
-    137:143:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):336:336 -> X
-    137:143:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
-    144:155:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):340:340 -> X
-    144:155:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
-    156:163:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):342:342 -> X
-    156:163:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
-    164:169:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):199:199 -> X
-    170:178:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):202:202 -> X
+    16:22:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):293:293 -> X
+    16:22:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    23:28:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):314:314 -> X
+    23:28:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):294 -> X
+    23:28:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    29:34:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):320:320 -> X
+    29:34:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):294 -> X
+    29:34:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    35:40:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):321:321 -> X
+    35:40:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):294 -> X
+    35:40:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    41:52:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):299:299 -> X
+    41:52:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    53:58:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):314:314 -> X
+    53:58:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):300 -> X
+    53:58:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    59:64:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):320:320 -> X
+    59:64:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):300 -> X
+    59:64:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    65:81:boolean com.rickmschulz.dnsautoswitcher.Reconciler.isWifi(android.net.ConnectivityManager,android.net.Network):321:321 -> X
+    65:81:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):300 -> X
+    65:81:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    82:89:android.net.Network com.rickmschulz.dnsautoswitcher.Reconciler.findWifiNetwork(android.net.ConnectivityManager):305:305 -> X
+    82:89:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):187 -> X
+    90:95:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromCapabilities(android.net.ConnectivityManager,android.net.Network):325:325 -> X
+    90:95:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):188 -> X
+    96:99:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromCapabilities(android.net.ConnectivityManager,android.net.Network):331:331 -> X
+    96:99:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):188 -> X
+    100:105:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromCapabilities(android.net.ConnectivityManager,android.net.Network):332:332 -> X
+    100:105:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):188 -> X
+    106:117:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromCapabilities(android.net.ConnectivityManager,android.net.Network):335:335 -> X
+    106:117:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):188 -> X
+    118:123:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):191:191 -> X
+    124:137:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):342:342 -> X
+    124:137:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
+    138:143:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):343:343 -> X
+    138:143:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
+    144:149:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):346:346 -> X
+    144:149:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
+    150:156:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):347:347 -> X
+    150:156:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
+    157:168:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):351:351 -> X
+    157:168:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
+    169:176:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.ssidFromWifiManager(android.content.Context):353:353 -> X
+    169:176:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):197 -> X
+    177:182:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):199:199 -> X
+    183:191:com.rickmschulz.dnsautoswitcher.Reconciler$Observation com.rickmschulz.dnsautoswitcher.Reconciler.observe(android.content.Context):202:202 -> X
     void androidx.emoji2.text.EmojiCompat$MetadataRepoLoaderCallback.onFailed(java.lang.Throwable) -> Y
     android.view.View androidx.fragment.app.FragmentContainer.onFindViewById(int) -> Z
     1:1:void androidx.appcompat.widget.AppCompatTextHelper$1.onFontRetrievalFailed(int):380:380 -> a0
@@ -99094,532 +99102,532 @@ com.rickmschulz.dnsautoswitcher.DNSService -> com.rickmschulz.dnsautoswitcher.DN
     1:3:void <init>():36:36 -> <init>
     4:7:void <init>():106:106 -> <init>
     8:16:void <init>():110:110 -> <init>
-    3:11:android.app.Notification buildNotification(java.lang.String):522:522 -> a
-    12:18:android.app.Notification buildNotification(java.lang.String):523:523 -> a
-    19:22:android.app.Notification buildNotification(java.lang.String):524:524 -> a
-    23:36:android.app.Notification buildNotification(java.lang.String):527:527 -> a
-    37:40:android.app.Notification buildNotification(java.lang.String):528:528 -> a
-    41:42:android.app.Notification buildNotification(java.lang.String):531:531 -> a
+    3:11:android.app.Notification buildNotification(java.lang.String):531:531 -> a
+    12:18:android.app.Notification buildNotification(java.lang.String):532:532 -> a
+    19:22:android.app.Notification buildNotification(java.lang.String):533:533 -> a
+    23:36:android.app.Notification buildNotification(java.lang.String):536:536 -> a
+    37:40:android.app.Notification buildNotification(java.lang.String):537:537 -> a
+    41:42:android.app.Notification buildNotification(java.lang.String):540:540 -> a
     43:45:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):1151:1151 -> a
-    43:45:android.app.Notification buildNotification(java.lang.String):531 -> a
+    43:45:android.app.Notification buildNotification(java.lang.String):540 -> a
     46:50:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):912:912 -> a
-    46:50:android.app.Notification buildNotification(java.lang.String):531 -> a
+    46:50:android.app.Notification buildNotification(java.lang.String):540 -> a
     51:57:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):916:916 -> a
-    51:57:android.app.Notification buildNotification(java.lang.String):531 -> a
+    51:57:android.app.Notification buildNotification(java.lang.String):540 -> a
     58:62:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):923:923 -> a
-    58:62:android.app.Notification buildNotification(java.lang.String):531 -> a
+    58:62:android.app.Notification buildNotification(java.lang.String):540 -> a
     63:64:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):934:934 -> a
-    63:64:android.app.Notification buildNotification(java.lang.String):531 -> a
+    63:64:android.app.Notification buildNotification(java.lang.String):540 -> a
     65:66:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):964:964 -> a
-    65:66:android.app.Notification buildNotification(java.lang.String):531 -> a
+    65:66:android.app.Notification buildNotification(java.lang.String):540 -> a
     67:71:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):967:967 -> a
-    67:71:android.app.Notification buildNotification(java.lang.String):531 -> a
+    67:71:android.app.Notification buildNotification(java.lang.String):540 -> a
     72:78:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):1155:1155 -> a
-    72:78:android.app.Notification buildNotification(java.lang.String):531 -> a
+    72:78:android.app.Notification buildNotification(java.lang.String):540 -> a
     79:80:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):1156:1156 -> a
-    79:80:android.app.Notification buildNotification(java.lang.String):531 -> a
+    79:80:android.app.Notification buildNotification(java.lang.String):540 -> a
     81:82:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):1157:1157 -> a
-    81:82:android.app.Notification buildNotification(java.lang.String):531 -> a
+    81:82:android.app.Notification buildNotification(java.lang.String):540 -> a
     83:89:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):1158:1158 -> a
-    83:89:android.app.Notification buildNotification(java.lang.String):531 -> a
+    83:89:android.app.Notification buildNotification(java.lang.String):540 -> a
     90:94:void androidx.core.app.NotificationCompat$Builder.<init>(android.content.Context,java.lang.String):1159:1159 -> a
-    90:94:android.app.Notification buildNotification(java.lang.String):531 -> a
+    90:94:android.app.Notification buildNotification(java.lang.String):540 -> a
     95:99:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setSmallIcon(int):1247:1247 -> a
-    95:99:android.app.Notification buildNotification(java.lang.String):532 -> a
-    100:103:android.app.Notification buildNotification(java.lang.String):533:533 -> a
+    95:99:android.app.Notification buildNotification(java.lang.String):541 -> a
+    100:103:android.app.Notification buildNotification(java.lang.String):542:542 -> a
     104:109:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setContentTitle(java.lang.CharSequence):1293:1293 -> a
-    104:109:android.app.Notification buildNotification(java.lang.String):533 -> a
+    104:109:android.app.Notification buildNotification(java.lang.String):542 -> a
     110:115:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setContentText(java.lang.CharSequence):1301:1301 -> a
-    110:115:android.app.Notification buildNotification(java.lang.String):534 -> a
-    116:119:android.app.Notification buildNotification(java.lang.String):534:534 -> a
+    110:115:android.app.Notification buildNotification(java.lang.String):543 -> a
+    116:119:android.app.Notification buildNotification(java.lang.String):543:543 -> a
     120:122:void androidx.core.app.NotificationCompat$Style.<init>():2542:2542 -> a
     120:122:void androidx.core.app.NotificationCompat$BigTextStyle.<init>():3369 -> a
-    120:122:android.app.Notification buildNotification(java.lang.String):534 -> a
+    120:122:android.app.Notification buildNotification(java.lang.String):543 -> a
     123:128:androidx.core.app.NotificationCompat$BigTextStyle androidx.core.app.NotificationCompat$BigTextStyle.bigText(java.lang.CharSequence):3399:3399 -> a
-    123:128:android.app.Notification buildNotification(java.lang.String):535 -> a
+    123:128:android.app.Notification buildNotification(java.lang.String):544 -> a
     129:132:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setStyle(androidx.core.app.NotificationCompat$Style):2048:2048 -> a
-    129:132:android.app.Notification buildNotification(java.lang.String):535 -> a
+    129:132:android.app.Notification buildNotification(java.lang.String):544 -> a
     133:134:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setStyle(androidx.core.app.NotificationCompat$Style):2049:2049 -> a
-    133:134:android.app.Notification buildNotification(java.lang.String):535 -> a
+    133:134:android.app.Notification buildNotification(java.lang.String):544 -> a
     135:137:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setStyle(androidx.core.app.NotificationCompat$Style):2051:2051 -> a
-    135:137:android.app.Notification buildNotification(java.lang.String):535 -> a
+    135:137:android.app.Notification buildNotification(java.lang.String):544 -> a
     138:142:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setContentIntent(android.app.PendingIntent):1421:1421 -> a
-    138:142:android.app.Notification buildNotification(java.lang.String):536 -> a
+    138:142:android.app.Notification buildNotification(java.lang.String):545 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    143:146:android.app.Notification buildNotification(java.lang.String):537:537 -> a
+    143:146:android.app.Notification buildNotification(java.lang.String):546:546 -> a
     147:154:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.addAction(int,java.lang.CharSequence,android.app.PendingIntent):1956:1956 -> a
-    147:154:android.app.Notification buildNotification(java.lang.String):537 -> a
+    147:154:android.app.Notification buildNotification(java.lang.String):546 -> a
     155:158:void androidx.core.app.NotificationCompat$Builder.setFlag(int,boolean):1740:1740 -> a
     155:158:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setOngoing(boolean):1641 -> a
-    155:158:android.app.Notification buildNotification(java.lang.String):538 -> a
+    155:158:android.app.Notification buildNotification(java.lang.String):547 -> a
     159:160:void androidx.core.app.NotificationCompat$Builder.setFlag(int,boolean):1740:1740 -> a
     159:160:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setOnlyAlertOnce(boolean):1674 -> a
-    159:160:android.app.Notification buildNotification(java.lang.String):539 -> a
+    159:160:android.app.Notification buildNotification(java.lang.String):548 -> a
     161:162:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setShowWhen(boolean):1191:1191 -> a
-    161:162:android.app.Notification buildNotification(java.lang.String):540 -> a
+    161:162:android.app.Notification buildNotification(java.lang.String):549 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     163:164:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setPriority(int):1769:1769 -> a
-    163:164:android.app.Notification buildNotification(java.lang.String):541 -> a
+    163:164:android.app.Notification buildNotification(java.lang.String):550 -> a
     165:166:androidx.core.app.NotificationCompat$Builder androidx.core.app.NotificationCompat$Builder.setForegroundServiceBehavior(int):2397:2397 -> a
-    165:166:android.app.Notification buildNotification(java.lang.String):543 -> a
+    165:166:android.app.Notification buildNotification(java.lang.String):552 -> a
     167:168:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):59:59 -> a
     167:168:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    167:168:android.app.Notification buildNotification(java.lang.String):544 -> a
+    167:168:android.app.Notification buildNotification(java.lang.String):553 -> a
     169:173:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):61:61 -> a
     169:173:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    169:173:android.app.Notification buildNotification(java.lang.String):544 -> a
+    169:173:android.app.Notification buildNotification(java.lang.String):553 -> a
     174:180:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):72:72 -> a
     174:180:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    174:180:android.app.Notification buildNotification(java.lang.String):544 -> a
+    174:180:android.app.Notification buildNotification(java.lang.String):553 -> a
     181:190:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):77:77 -> a
     181:190:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    181:190:android.app.Notification buildNotification(java.lang.String):544 -> a
+    181:190:android.app.Notification buildNotification(java.lang.String):553 -> a
     191:196:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):78:78 -> a
     191:196:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    191:196:android.app.Notification buildNotification(java.lang.String):544 -> a
+    191:196:android.app.Notification buildNotification(java.lang.String):553 -> a
     197:203:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):79:79 -> a
     197:203:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    197:203:android.app.Notification buildNotification(java.lang.String):544 -> a
+    197:203:android.app.Notification buildNotification(java.lang.String):553 -> a
     204:209:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):80:80 -> a
     204:209:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    204:209:android.app.Notification buildNotification(java.lang.String):544 -> a
+    204:209:android.app.Notification buildNotification(java.lang.String):553 -> a
     210:219:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):81:81 -> a
     210:219:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    210:219:android.app.Notification buildNotification(java.lang.String):544 -> a
+    210:219:android.app.Notification buildNotification(java.lang.String):553 -> a
     220:232:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):82:82 -> a
     220:232:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    220:232:android.app.Notification buildNotification(java.lang.String):544 -> a
+    220:232:android.app.Notification buildNotification(java.lang.String):553 -> a
     233:245:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):83:83 -> a
     233:245:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    233:245:android.app.Notification buildNotification(java.lang.String):544 -> a
+    233:245:android.app.Notification buildNotification(java.lang.String):553 -> a
     246:258:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):84:84 -> a
     246:258:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    246:258:android.app.Notification buildNotification(java.lang.String):544 -> a
+    246:258:android.app.Notification buildNotification(java.lang.String):553 -> a
     259:264:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):85:85 -> a
     259:264:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    259:264:android.app.Notification buildNotification(java.lang.String):544 -> a
+    259:264:android.app.Notification buildNotification(java.lang.String):553 -> a
     265:270:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):86:86 -> a
     265:270:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    265:270:android.app.Notification buildNotification(java.lang.String):544 -> a
+    265:270:android.app.Notification buildNotification(java.lang.String):553 -> a
     271:276:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):87:87 -> a
     271:276:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    271:276:android.app.Notification buildNotification(java.lang.String):544 -> a
+    271:276:android.app.Notification buildNotification(java.lang.String):553 -> a
     277:280:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):88:88 -> a
     277:280:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    277:280:android.app.Notification buildNotification(java.lang.String):544 -> a
+    277:280:android.app.Notification buildNotification(java.lang.String):553 -> a
     281:286:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):89:89 -> a
     281:286:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    281:286:android.app.Notification buildNotification(java.lang.String):544 -> a
+    281:286:android.app.Notification buildNotification(java.lang.String):553 -> a
     287:292:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):90:90 -> a
     287:292:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    287:292:android.app.Notification buildNotification(java.lang.String):544 -> a
+    287:292:android.app.Notification buildNotification(java.lang.String):553 -> a
     293:305:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):91:91 -> a
     293:305:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    293:305:android.app.Notification buildNotification(java.lang.String):544 -> a
+    293:305:android.app.Notification buildNotification(java.lang.String):553 -> a
     306:309:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):92:92 -> a
     306:309:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    306:309:android.app.Notification buildNotification(java.lang.String):544 -> a
+    306:309:android.app.Notification buildNotification(java.lang.String):553 -> a
     310:313:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):94:94 -> a
     310:313:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    310:313:android.app.Notification buildNotification(java.lang.String):544 -> a
+    310:313:android.app.Notification buildNotification(java.lang.String):553 -> a
     314:317:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):95:95 -> a
     314:317:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    314:317:android.app.Notification buildNotification(java.lang.String):544 -> a
+    314:317:android.app.Notification buildNotification(java.lang.String):553 -> a
     318:320:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):96:96 -> a
     318:320:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    318:320:android.app.Notification buildNotification(java.lang.String):544 -> a
+    318:320:android.app.Notification buildNotification(java.lang.String):553 -> a
     321:324:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):101:101 -> a
     321:324:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    321:324:android.app.Notification buildNotification(java.lang.String):544 -> a
+    321:324:android.app.Notification buildNotification(java.lang.String):553 -> a
     325:330:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):102:102 -> a
     325:330:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    325:330:android.app.Notification buildNotification(java.lang.String):544 -> a
+    325:330:android.app.Notification buildNotification(java.lang.String):553 -> a
     331:333:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):103:103 -> a
     331:333:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    331:333:android.app.Notification buildNotification(java.lang.String):544 -> a
+    331:333:android.app.Notification buildNotification(java.lang.String):553 -> a
     334:350:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):104:104 -> a
     334:350:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    334:350:android.app.Notification buildNotification(java.lang.String):544 -> a
+    334:350:android.app.Notification buildNotification(java.lang.String):553 -> a
     351:352:androidx.core.graphics.drawable.IconCompat androidx.core.app.NotificationCompat$Action.getIconCompat():4743:4743 -> a
     351:352:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):356 -> a
     351:352:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     351:352:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    351:352:android.app.Notification buildNotification(java.lang.String):544 -> a
+    351:352:android.app.Notification buildNotification(java.lang.String):553 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(4)"]}
     353:354:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):356:356 -> a
     353:354:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     353:354:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    353:354:android.app.Notification buildNotification(java.lang.String):544 -> a
+    353:354:android.app.Notification buildNotification(java.lang.String):553 -> a
     355:358:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):358:358 -> a
     355:358:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     355:358:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    355:358:android.app.Notification buildNotification(java.lang.String):544 -> a
+    355:358:android.app.Notification buildNotification(java.lang.String):553 -> a
     359:364:android.graphics.drawable.Icon androidx.core.graphics.drawable.IconCompat.toIcon(android.content.Context):541:541 -> a
     359:364:android.graphics.drawable.Icon androidx.core.graphics.drawable.IconCompat.toIcon():529 -> a
     359:364:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):359 -> a
     359:364:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     359:364:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    359:364:android.app.Notification buildNotification(java.lang.String):544 -> a
+    359:364:android.app.Notification buildNotification(java.lang.String):553 -> a
     365:366:java.lang.CharSequence androidx.core.app.NotificationCompat$Action.getTitle():4750:4750 -> a
     365:366:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):360 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     365:366:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     365:366:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    365:366:android.app.Notification buildNotification(java.lang.String):544 -> a
+    365:366:android.app.Notification buildNotification(java.lang.String):553 -> a
     367:368:android.app.PendingIntent androidx.core.app.NotificationCompat$Action.getActionIntent():4754:4754 -> a
     367:368:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):361 -> a
     367:368:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     367:368:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    367:368:android.app.Notification buildNotification(java.lang.String):544 -> a
+    367:368:android.app.Notification buildNotification(java.lang.String):553 -> a
     369:371:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):361:361 -> a
     369:371:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     369:371:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    369:371:android.app.Notification buildNotification(java.lang.String):544 -> a
+    369:371:android.app.Notification buildNotification(java.lang.String):553 -> a
     372:376:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):376:376 -> a
     372:376:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     372:376:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    372:376:android.app.Notification buildNotification(java.lang.String):544 -> a
+    372:376:android.app.Notification buildNotification(java.lang.String):553 -> a
     377:379:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):380:380 -> a
     377:379:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     377:379:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    377:379:android.app.Notification buildNotification(java.lang.String):544 -> a
+    377:379:android.app.Notification buildNotification(java.lang.String):553 -> a
     380:382:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):383:383 -> a
     380:382:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     380:382:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    380:382:android.app.Notification buildNotification(java.lang.String):544 -> a
+    380:382:android.app.Notification buildNotification(java.lang.String):553 -> a
     383:388:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):386:386 -> a
     383:388:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     383:388:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    383:388:android.app.Notification buildNotification(java.lang.String):544 -> a
+    383:388:android.app.Notification buildNotification(java.lang.String):553 -> a
     389:391:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):389:389 -> a
     389:391:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     389:391:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    389:391:android.app.Notification buildNotification(java.lang.String):544 -> a
+    389:391:android.app.Notification buildNotification(java.lang.String):553 -> a
     392:397:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):392:392 -> a
     392:397:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     392:397:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    392:397:android.app.Notification buildNotification(java.lang.String):544 -> a
+    392:397:android.app.Notification buildNotification(java.lang.String):553 -> a
     398:404:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):393:393 -> a
     398:404:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     398:404:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    398:404:android.app.Notification buildNotification(java.lang.String):544 -> a
+    398:404:android.app.Notification buildNotification(java.lang.String):553 -> a
     405:407:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):397:397 -> a
     405:407:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     405:407:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    405:407:android.app.Notification buildNotification(java.lang.String):544 -> a
+    405:407:android.app.Notification buildNotification(java.lang.String):553 -> a
     408:409:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):400:400 -> a
     408:409:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     408:409:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    408:409:android.app.Notification buildNotification(java.lang.String):544 -> a
+    408:409:android.app.Notification buildNotification(java.lang.String):553 -> a
     410:411:boolean androidx.core.app.NotificationCompat$Action.getShowsUserInterface():4831:4831 -> a
     410:411:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):401 -> a
     410:411:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     410:411:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    410:411:android.app.Notification buildNotification(java.lang.String):544 -> a
+    410:411:android.app.Notification buildNotification(java.lang.String):553 -> a
     412:414:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):400:400 -> a
     412:414:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     412:414:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    412:414:android.app.Notification buildNotification(java.lang.String):544 -> a
+    412:414:android.app.Notification buildNotification(java.lang.String):553 -> a
     415:417:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):402:402 -> a
     415:417:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     415:417:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    415:417:android.app.Notification buildNotification(java.lang.String):544 -> a
+    415:417:android.app.Notification buildNotification(java.lang.String):553 -> a
     418:426:void androidx.core.app.NotificationCompatBuilder.addAction(androidx.core.app.NotificationCompat$Action):403:403 -> a
     418:426:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):105 -> a
     418:426:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    418:426:android.app.Notification buildNotification(java.lang.String):544 -> a
+    418:426:android.app.Notification buildNotification(java.lang.String):553 -> a
     427:430:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):108:108 -> a
     427:430:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    427:430:android.app.Notification buildNotification(java.lang.String):544 -> a
+    427:430:android.app.Notification buildNotification(java.lang.String):553 -> a
     431:433:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):109:109 -> a
     431:433:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    431:433:android.app.Notification buildNotification(java.lang.String):544 -> a
+    431:433:android.app.Notification buildNotification(java.lang.String):553 -> a
     434:439:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):133:133 -> a
     434:439:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    434:439:android.app.Notification buildNotification(java.lang.String):544 -> a
+    434:439:android.app.Notification buildNotification(java.lang.String):553 -> a
     440:444:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):145:145 -> a
     440:444:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    440:444:android.app.Notification buildNotification(java.lang.String):544 -> a
+    440:444:android.app.Notification buildNotification(java.lang.String):553 -> a
     445:448:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):146:146 -> a
     445:448:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    445:448:android.app.Notification buildNotification(java.lang.String):544 -> a
+    445:448:android.app.Notification buildNotification(java.lang.String):553 -> a
     449:452:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):147:147 -> a
     449:452:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    449:452:android.app.Notification buildNotification(java.lang.String):544 -> a
+    449:452:android.app.Notification buildNotification(java.lang.String):553 -> a
     453:455:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):148:148 -> a
     453:455:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    453:455:android.app.Notification buildNotification(java.lang.String):544 -> a
+    453:455:android.app.Notification buildNotification(java.lang.String):553 -> a
     456:459:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):153:153 -> a
     456:459:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    456:459:android.app.Notification buildNotification(java.lang.String):544 -> a
+    456:459:android.app.Notification buildNotification(java.lang.String):553 -> a
     460:463:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):154:154 -> a
     460:463:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    460:463:android.app.Notification buildNotification(java.lang.String):544 -> a
+    460:463:android.app.Notification buildNotification(java.lang.String):553 -> a
     464:467:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):155:155 -> a
     464:467:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    464:467:android.app.Notification buildNotification(java.lang.String):544 -> a
+    464:467:android.app.Notification buildNotification(java.lang.String):553 -> a
     468:475:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):156:156 -> a
     468:475:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    468:475:android.app.Notification buildNotification(java.lang.String):544 -> a
+    468:475:android.app.Notification buildNotification(java.lang.String):553 -> a
     476:478:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):157:157 -> a
     476:478:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    476:478:android.app.Notification buildNotification(java.lang.String):544 -> a
+    476:478:android.app.Notification buildNotification(java.lang.String):553 -> a
     479:482:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):164:164 -> a
     479:482:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    479:482:android.app.Notification buildNotification(java.lang.String):544 -> a
+    479:482:android.app.Notification buildNotification(java.lang.String):553 -> a
     483:488:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):166:166 -> a
     483:488:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    483:488:android.app.Notification buildNotification(java.lang.String):544 -> a
+    483:488:android.app.Notification buildNotification(java.lang.String):553 -> a
     489:503:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):167:167 -> a
     489:503:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    489:503:android.app.Notification buildNotification(java.lang.String):544 -> a
+    489:503:android.app.Notification buildNotification(java.lang.String):553 -> a
     504:507:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):168:168 -> a
     504:507:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    504:507:android.app.Notification buildNotification(java.lang.String):544 -> a
+    504:507:android.app.Notification buildNotification(java.lang.String):553 -> a
     508:513:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):174:174 -> a
     508:513:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    508:513:android.app.Notification buildNotification(java.lang.String):544 -> a
+    508:513:android.app.Notification buildNotification(java.lang.String):553 -> a
     514:517:android.os.Bundle androidx.core.app.NotificationCompat$Builder.getExtras():1932:1932 -> a
     514:517:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):178 -> a
     514:517:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    514:517:android.app.Notification buildNotification(java.lang.String):544 -> a
+    514:517:android.app.Notification buildNotification(java.lang.String):553 -> a
     518:524:android.os.Bundle androidx.core.app.NotificationCompat$Builder.getExtras():1933:1933 -> a
     518:524:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):178 -> a
     518:524:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    518:524:android.app.Notification buildNotification(java.lang.String):544 -> a
+    518:524:android.app.Notification buildNotification(java.lang.String):553 -> a
     525:532:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):178:178 -> a
     525:532:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    525:532:android.app.Notification buildNotification(java.lang.String):544 -> a
+    525:532:android.app.Notification buildNotification(java.lang.String):553 -> a
     533:537:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):180:180 -> a
     533:537:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    533:537:android.app.Notification buildNotification(java.lang.String):544 -> a
+    533:537:android.app.Notification buildNotification(java.lang.String):553 -> a
     538:542:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):182:182 -> a
     538:542:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    538:542:android.app.Notification buildNotification(java.lang.String):544 -> a
+    538:542:android.app.Notification buildNotification(java.lang.String):553 -> a
     543:548:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):183:183 -> a
     543:548:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    543:548:android.app.Notification buildNotification(java.lang.String):544 -> a
+    543:548:android.app.Notification buildNotification(java.lang.String):553 -> a
     549:554:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):184:184 -> a
     549:554:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    549:554:android.app.Notification buildNotification(java.lang.String):544 -> a
+    549:554:android.app.Notification buildNotification(java.lang.String):553 -> a
     555:558:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):186:186 -> a
     555:558:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    555:558:android.app.Notification buildNotification(java.lang.String):544 -> a
+    555:558:android.app.Notification buildNotification(java.lang.String):553 -> a
     559:564:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):188:188 -> a
     559:564:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    559:564:android.app.Notification buildNotification(java.lang.String):544 -> a
+    559:564:android.app.Notification buildNotification(java.lang.String):553 -> a
     565:569:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):258:258 -> a
     565:569:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     565:569:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    565:569:android.app.Notification buildNotification(java.lang.String):544 -> a
+    565:569:android.app.Notification buildNotification(java.lang.String):553 -> a
     570:571:androidx.core.graphics.drawable.IconCompat androidx.core.app.NotificationCompat$Action.getIconCompat():4743:4743 -> a
     570:571:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):259 -> a
     570:571:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     570:571:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    570:571:android.app.Notification buildNotification(java.lang.String):544 -> a
+    570:571:android.app.Notification buildNotification(java.lang.String):553 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(4)"]}
     572:575:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):259:259 -> a
     572:575:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     572:575:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    572:575:android.app.Notification buildNotification(java.lang.String):544 -> a
+    572:575:android.app.Notification buildNotification(java.lang.String):553 -> a
     576:586:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):260:260 -> a
     576:586:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     576:586:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    576:586:android.app.Notification buildNotification(java.lang.String):544 -> a
+    576:586:android.app.Notification buildNotification(java.lang.String):553 -> a
     587:588:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):261:261 -> a
     587:588:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     587:588:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    587:588:android.app.Notification buildNotification(java.lang.String):544 -> a
+    587:588:android.app.Notification buildNotification(java.lang.String):553 -> a
     589:590:java.lang.CharSequence androidx.core.app.NotificationCompat$Action.getTitle():4750:4750 -> a
     589:590:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):261 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     589:590:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     589:590:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    589:590:android.app.Notification buildNotification(java.lang.String):544 -> a
+    589:590:android.app.Notification buildNotification(java.lang.String):553 -> a
     591:593:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):261:261 -> a
     591:593:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     591:593:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    591:593:android.app.Notification buildNotification(java.lang.String):544 -> a
+    591:593:android.app.Notification buildNotification(java.lang.String):553 -> a
     594:595:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):262:262 -> a
     594:595:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     594:595:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    594:595:android.app.Notification buildNotification(java.lang.String):544 -> a
+    594:595:android.app.Notification buildNotification(java.lang.String):553 -> a
     596:597:android.app.PendingIntent androidx.core.app.NotificationCompat$Action.getActionIntent():4754:4754 -> a
     596:597:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):262 -> a
     596:597:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     596:597:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    596:597:android.app.Notification buildNotification(java.lang.String):544 -> a
+    596:597:android.app.Notification buildNotification(java.lang.String):553 -> a
     598:600:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):262:262 -> a
     598:600:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     598:600:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    598:600:android.app.Notification buildNotification(java.lang.String):544 -> a
+    598:600:android.app.Notification buildNotification(java.lang.String):553 -> a
     601:606:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):265:265 -> a
     601:606:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     601:606:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    601:606:android.app.Notification buildNotification(java.lang.String):544 -> a
+    601:606:android.app.Notification buildNotification(java.lang.String):553 -> a
     607:609:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):269:269 -> a
     607:609:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     607:609:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    607:609:android.app.Notification buildNotification(java.lang.String):544 -> a
+    607:609:android.app.Notification buildNotification(java.lang.String):553 -> a
     610:614:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):271:271 -> a
     610:614:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     610:614:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    610:614:android.app.Notification buildNotification(java.lang.String):544 -> a
+    610:614:android.app.Notification buildNotification(java.lang.String):553 -> a
     615:620:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):272:272 -> a
     615:620:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     615:620:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    615:620:android.app.Notification buildNotification(java.lang.String):544 -> a
+    615:620:android.app.Notification buildNotification(java.lang.String):553 -> a
     621:622:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):273:273 -> a
     621:622:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     621:622:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    621:622:android.app.Notification buildNotification(java.lang.String):544 -> a
+    621:622:android.app.Notification buildNotification(java.lang.String):553 -> a
     623:624:boolean androidx.core.app.NotificationCompat$Action.getShowsUserInterface():4831:4831 -> a
     623:624:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):273 -> a
     623:624:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     623:624:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    623:624:android.app.Notification buildNotification(java.lang.String):544 -> a
+    623:624:android.app.Notification buildNotification(java.lang.String):553 -> a
     625:627:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):273:273 -> a
     625:627:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     625:627:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    625:627:android.app.Notification buildNotification(java.lang.String):544 -> a
+    625:627:android.app.Notification buildNotification(java.lang.String):553 -> a
     628:633:android.os.Bundle androidx.core.app.NotificationCompatJellybean.getBundleForAction(androidx.core.app.NotificationCompat$Action):274:274 -> a
     628:633:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):187 -> a
     628:633:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    628:633:android.app.Notification buildNotification(java.lang.String):544 -> a
+    628:633:android.app.Notification buildNotification(java.lang.String):553 -> a
     634:639:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):185:185 -> a
     634:639:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    634:639:android.app.Notification buildNotification(java.lang.String):544 -> a
+    634:639:android.app.Notification buildNotification(java.lang.String):553 -> a
     640:644:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):190:190 -> a
     640:644:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    640:644:android.app.Notification buildNotification(java.lang.String):544 -> a
+    640:644:android.app.Notification buildNotification(java.lang.String):553 -> a
     645:647:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):192:192 -> a
     645:647:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    645:647:android.app.Notification buildNotification(java.lang.String):544 -> a
+    645:647:android.app.Notification buildNotification(java.lang.String):553 -> a
     648:651:android.os.Bundle androidx.core.app.NotificationCompat$Builder.getExtras():1932:1932 -> a
     648:651:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):194 -> a
     648:651:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    648:651:android.app.Notification buildNotification(java.lang.String):544 -> a
+    648:651:android.app.Notification buildNotification(java.lang.String):553 -> a
     652:658:android.os.Bundle androidx.core.app.NotificationCompat$Builder.getExtras():1933:1933 -> a
     652:658:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):194 -> a
     652:658:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    652:658:android.app.Notification buildNotification(java.lang.String):544 -> a
+    652:658:android.app.Notification buildNotification(java.lang.String):553 -> a
     659:661:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):194:194 -> a
     659:661:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    659:661:android.app.Notification buildNotification(java.lang.String):544 -> a
+    659:661:android.app.Notification buildNotification(java.lang.String):553 -> a
     662:664:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):196:196 -> a
     662:664:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    662:664:android.app.Notification buildNotification(java.lang.String):544 -> a
+    662:664:android.app.Notification buildNotification(java.lang.String):553 -> a
     665:671:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):206:206 -> a
     665:671:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    665:671:android.app.Notification buildNotification(java.lang.String):544 -> a
+    665:671:android.app.Notification buildNotification(java.lang.String):553 -> a
     672:675:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):207:207 -> a
     672:675:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    672:675:android.app.Notification buildNotification(java.lang.String):544 -> a
+    672:675:android.app.Notification buildNotification(java.lang.String):553 -> a
     676:679:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):219:219 -> a
     676:679:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    676:679:android.app.Notification buildNotification(java.lang.String):544 -> a
+    676:679:android.app.Notification buildNotification(java.lang.String):553 -> a
     680:683:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):220:220 -> a
     680:683:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    680:683:android.app.Notification buildNotification(java.lang.String):544 -> a
+    680:683:android.app.Notification buildNotification(java.lang.String):553 -> a
     684:689:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):221:221 -> a
     684:689:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    684:689:android.app.Notification buildNotification(java.lang.String):544 -> a
+    684:689:android.app.Notification buildNotification(java.lang.String):553 -> a
     690:693:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):222:222 -> a
     690:693:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    690:693:android.app.Notification buildNotification(java.lang.String):544 -> a
+    690:693:android.app.Notification buildNotification(java.lang.String):553 -> a
     694:696:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):223:223 -> a
     694:696:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    694:696:android.app.Notification buildNotification(java.lang.String):544 -> a
+    694:696:android.app.Notification buildNotification(java.lang.String):553 -> a
     697:700:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):229:229 -> a
     697:700:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    697:700:android.app.Notification buildNotification(java.lang.String):544 -> a
+    697:700:android.app.Notification buildNotification(java.lang.String):553 -> a
     701:704:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):230:230 -> a
     701:704:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    701:704:android.app.Notification buildNotification(java.lang.String):544 -> a
+    701:704:android.app.Notification buildNotification(java.lang.String):553 -> a
     705:708:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):231:231 -> a
     705:708:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    705:708:android.app.Notification buildNotification(java.lang.String):544 -> a
+    705:708:android.app.Notification buildNotification(java.lang.String):553 -> a
     709:711:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):232:232 -> a
     709:711:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    709:711:android.app.Notification buildNotification(java.lang.String):544 -> a
+    709:711:android.app.Notification buildNotification(java.lang.String):553 -> a
     712:723:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):236:236 -> a
     712:723:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    712:723:android.app.Notification buildNotification(java.lang.String):544 -> a
+    712:723:android.app.Notification buildNotification(java.lang.String):553 -> a
     724:729:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):240:240 -> a
     724:729:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    724:729:android.app.Notification buildNotification(java.lang.String):544 -> a
+    724:729:android.app.Notification buildNotification(java.lang.String):553 -> a
     730:734:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):241:241 -> a
     730:734:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    730:734:android.app.Notification buildNotification(java.lang.String):544 -> a
+    730:734:android.app.Notification buildNotification(java.lang.String):553 -> a
     735:741:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):244:244 -> a
     735:741:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    735:741:android.app.Notification buildNotification(java.lang.String):544 -> a
+    735:741:android.app.Notification buildNotification(java.lang.String):553 -> a
     742:745:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):251:251 -> a
     742:745:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    742:745:android.app.Notification buildNotification(java.lang.String):544 -> a
+    742:745:android.app.Notification buildNotification(java.lang.String):553 -> a
     746:748:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):252:252 -> a
     746:748:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    746:748:android.app.Notification buildNotification(java.lang.String):544 -> a
+    746:748:android.app.Notification buildNotification(java.lang.String):553 -> a
     749:752:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():315:315 -> a
     749:752:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    749:752:android.app.Notification buildNotification(java.lang.String):544 -> a
+    749:752:android.app.Notification buildNotification(java.lang.String):553 -> a
     753:754:void androidx.core.app.NotificationCompat$BigTextStyle.apply(androidx.core.app.NotificationBuilderWithBuilderAccessor):3420:3420 -> a
     753:754:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():317 -> a
     753:754:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    753:754:android.app.Notification buildNotification(java.lang.String):544 -> a
+    753:754:android.app.Notification buildNotification(java.lang.String):553 -> a
     755:758:void androidx.core.app.NotificationCompat$BigTextStyle.apply(androidx.core.app.NotificationBuilderWithBuilderAccessor):3421:3421 -> a
     755:758:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():317 -> a
     755:758:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    755:758:android.app.Notification buildNotification(java.lang.String):544 -> a
+    755:758:android.app.Notification buildNotification(java.lang.String):553 -> a
     759:766:void androidx.core.app.NotificationCompat$BigTextStyle.apply(androidx.core.app.NotificationBuilderWithBuilderAccessor):3422:3422 -> a
     759:766:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():317 -> a
     759:766:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    759:766:android.app.Notification buildNotification(java.lang.String):544 -> a
+    759:766:android.app.Notification buildNotification(java.lang.String):553 -> a
     767:769:void androidx.core.app.NotificationCompat$BigTextStyle.apply(androidx.core.app.NotificationBuilderWithBuilderAccessor):3423:3423 -> a
     767:769:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():317 -> a
     767:769:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    767:769:android.app.Notification buildNotification(java.lang.String):544 -> a
+    767:769:android.app.Notification buildNotification(java.lang.String):553 -> a
     770:775:android.app.Notification androidx.core.app.NotificationCompatBuilder.buildInternal():413:413 -> a
     770:775:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():323 -> a
     770:775:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    770:775:android.app.Notification buildNotification(java.lang.String):544 -> a
+    770:775:android.app.Notification buildNotification(java.lang.String):553 -> a
     776:777:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():336:336 -> a
     776:777:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    776:777:android.app.Notification buildNotification(java.lang.String):544 -> a
+    776:777:android.app.Notification buildNotification(java.lang.String):553 -> a
     778:780:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():337:337 -> a
     778:780:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    778:780:android.app.Notification buildNotification(java.lang.String):544 -> a
+    778:780:android.app.Notification buildNotification(java.lang.String):553 -> a
     781:784:android.os.Bundle androidx.core.app.NotificationCompat.getExtras(android.app.Notification):7475:7475 -> a
     781:784:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():344 -> a
     781:784:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    781:784:android.app.Notification buildNotification(java.lang.String):544 -> a
+    781:784:android.app.Notification buildNotification(java.lang.String):553 -> a
     785:786:void androidx.core.app.NotificationCompat$Style.addCompatExtras(android.os.Bundle):2648:2648 -> a
     785:786:void androidx.core.app.NotificationCompat$BigTextStyle.addCompatExtras(android.os.Bundle):3447 -> a
     785:786:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():346 -> a
     785:786:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    785:786:android.app.Notification buildNotification(java.lang.String):544 -> a
+    785:786:android.app.Notification buildNotification(java.lang.String):553 -> a
     787:792:void androidx.core.app.NotificationCompat$Style.addCompatExtras(android.os.Bundle):2650:2650 -> a
     787:792:void androidx.core.app.NotificationCompat$BigTextStyle.addCompatExtras(android.os.Bundle):3447 -> a
     787:792:android.app.Notification androidx.core.app.NotificationCompatBuilder.build():346 -> a
     787:792:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    787:792:android.app.Notification buildNotification(java.lang.String):544 -> a
+    787:792:android.app.Notification buildNotification(java.lang.String):553 -> a
     793:796:android.app.Notification buildNotification(java.lang.String):0:0 -> a
       # {"id":"com.android.tools.r8.outlineCallsite","positions":{"1":798,"5":800,"8":803,"10":807},"outline":"Ldt;d(Ljava/util/Iterator;)Ljava/lang/ClassCastException;"}
     797:797:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):236:236 -> a
     797:797:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    797:797:android.app.Notification buildNotification(java.lang.String):544 -> a
+    797:797:android.app.Notification buildNotification(java.lang.String):553 -> a
     798:798:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):236:236 -> a
     798:798:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    798:798:android.app.Notification buildNotification(java.lang.String):544 -> a
+    798:798:android.app.Notification buildNotification(java.lang.String):553 -> a
     800:800:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):237:237 -> a
     800:800:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    800:800:android.app.Notification buildNotification(java.lang.String):544 -> a
+    800:800:android.app.Notification buildNotification(java.lang.String):553 -> a
     803:803:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):236:236 -> a
     803:803:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    803:803:android.app.Notification buildNotification(java.lang.String):544 -> a
+    803:803:android.app.Notification buildNotification(java.lang.String):553 -> a
     807:807:void androidx.core.app.NotificationCompatBuilder.<init>(androidx.core.app.NotificationCompat$Builder):236:236 -> a
     807:807:android.app.Notification androidx.core.app.NotificationCompat$Builder.build():2448 -> a
-    807:807:android.app.Notification buildNotification(java.lang.String):544 -> a
+    807:807:android.app.Notification buildNotification(java.lang.String):553 -> a
     1:4:void refreshRegistration():376:376 -> b
     5:8:void refreshRegistration():379:379 -> b
     9:17:void refreshRegistration():380:380 -> b
@@ -99673,56 +99681,56 @@ com.rickmschulz.dnsautoswitcher.DNSService -> com.rickmschulz.dnsautoswitcher.DN
     36:40:void start(android.content.Context):151:151 -> f
     41:46:void start(android.content.Context):154:154 -> f
     1:8:boolean com.rickmschulz.dnsautoswitcher.Reconciler.hasPermission(android.content.Context):123:123 -> g
-    1:8:java.lang.String statusText():479 -> g
-    9:15:java.lang.String statusText():482:482 -> g
-    16:20:java.lang.String statusText():483:483 -> g
-    21:32:java.lang.String statusText():485:485 -> g
-    33:47:java.lang.String statusText():486:486 -> g
-    48:52:java.lang.String statusText():487:487 -> g
-    53:56:java.lang.String statusText():489:489 -> g
-    57:64:java.lang.String statusText():490:490 -> g
+    1:8:java.lang.String statusText():488 -> g
+    9:15:java.lang.String statusText():491:491 -> g
+    16:20:java.lang.String statusText():492:492 -> g
+    21:32:java.lang.String statusText():494:494 -> g
+    33:47:java.lang.String statusText():495:495 -> g
+    48:52:java.lang.String statusText():496:496 -> g
+    53:56:java.lang.String statusText():498:498 -> g
+    57:64:java.lang.String statusText():499:499 -> g
     65:79:java.lang.String com.rickmschulz.dnsautoswitcher.Reconciler.currentMode(android.content.Context):268:268 -> g
-    65:79:java.lang.String statusText():492 -> g
-    80:87:java.lang.String statusText():492:492 -> g
-    88:95:java.lang.String statusText():493:493 -> g
-    96:111:java.lang.String statusText():494:494 -> g
-    112:120:java.lang.String statusText():496:496 -> g
-    121:125:java.lang.String statusText():497:497 -> g
-    126:145:java.lang.String statusText():498:498 -> g
-    146:154:java.lang.String statusText():500:500 -> g
-    155:162:java.lang.String statusText():501:501 -> g
-    163:174:java.lang.String statusText():502:502 -> g
-    175:179:java.lang.String statusText():480:480 -> g
+    65:79:java.lang.String statusText():501 -> g
+    80:87:java.lang.String statusText():501:501 -> g
+    88:95:java.lang.String statusText():502:502 -> g
+    96:111:java.lang.String statusText():503:503 -> g
+    112:120:java.lang.String statusText():505:505 -> g
+    121:125:java.lang.String statusText():506:506 -> g
+    126:145:java.lang.String statusText():507:507 -> g
+    146:154:java.lang.String statusText():509:509 -> g
+    155:162:java.lang.String statusText():510:510 -> g
+    163:174:java.lang.String statusText():511:511 -> g
+    175:179:java.lang.String statusText():489:489 -> g
     1:7:android.content.SharedPreferences com.rickmschulz.dnsautoswitcher.Reconciler.prefs(android.content.Context):61:61 -> h
     1:7:boolean showsNotification(android.content.Context):131 -> h
-    1:7:void updateForegroundMode():448 -> h
+    1:7:void updateForegroundMode():457 -> h
     8:13:boolean showsNotification(android.content.Context):131:131 -> h
-    8:13:void updateForegroundMode():448 -> h
-    14:24:void updateForegroundMode():449:449 -> h
-    25:32:void updateNotification():472:472 -> h
-    25:32:void updateForegroundMode():451 -> h
-    33:44:void updateNotification():474:474 -> h
-    33:44:void updateForegroundMode():451 -> h
-    45:48:void updateForegroundMode():456:456 -> h
-    49:56:void createNotificationChannel():506:506 -> h
-    49:56:void updateForegroundMode():457 -> h
-    57:61:void createNotificationChannel():510:510 -> h
-    57:61:void updateForegroundMode():457 -> h
-    62:74:void createNotificationChannel():512:512 -> h
-    62:74:void updateForegroundMode():457 -> h
-    75:81:void createNotificationChannel():516:516 -> h
-    75:81:void updateForegroundMode():457 -> h
-    82:84:void createNotificationChannel():517:517 -> h
-    82:84:void updateForegroundMode():457 -> h
-    85:87:void createNotificationChannel():518:518 -> h
-    85:87:void updateForegroundMode():457 -> h
-    88:98:void updateForegroundMode():458:458 -> h
-    99:100:void updateForegroundMode():459:459 -> h
-    101:106:void updateForegroundMode():460:460 -> h
+    8:13:void updateForegroundMode():457 -> h
+    14:24:void updateForegroundMode():458:458 -> h
+    25:32:void updateNotification():481:481 -> h
+    25:32:void updateForegroundMode():460 -> h
+    33:44:void updateNotification():483:483 -> h
+    33:44:void updateForegroundMode():460 -> h
+    45:48:void updateForegroundMode():465:465 -> h
+    49:56:void createNotificationChannel():515:515 -> h
+    49:56:void updateForegroundMode():466 -> h
+    57:61:void createNotificationChannel():519:519 -> h
+    57:61:void updateForegroundMode():466 -> h
+    62:74:void createNotificationChannel():521:521 -> h
+    62:74:void updateForegroundMode():466 -> h
+    75:81:void createNotificationChannel():525:525 -> h
+    75:81:void updateForegroundMode():466 -> h
+    82:84:void createNotificationChannel():526:526 -> h
+    82:84:void updateForegroundMode():466 -> h
+    85:87:void createNotificationChannel():527:527 -> h
+    85:87:void updateForegroundMode():466 -> h
+    88:98:void updateForegroundMode():467:467 -> h
+    99:100:void updateForegroundMode():468:468 -> h
+    101:106:void updateForegroundMode():469:469 -> h
     107:109:void androidx.core.app.ServiceCompat.stopForeground(android.app.Service,int):102:102 -> h
-    107:109:void updateForegroundMode():462 -> h
-    110:111:void updateForegroundMode():463:463 -> h
-    112:117:void updateForegroundMode():464:464 -> h
+    107:109:void updateForegroundMode():471 -> h
+    110:111:void updateForegroundMode():472:472 -> h
+    112:117:void updateForegroundMode():473:473 -> h
     1:2:android.os.IBinder onBind(android.content.Intent):0:0 -> onBind
     1:3:void onCreate():170:170 -> onCreate
     4:10:void onCreate():171:171 -> onCreate
@@ -99731,7 +99739,7 @@ com.rickmschulz.dnsautoswitcher.DNSService -> com.rickmschulz.dnsautoswitcher.DN
     18:19:void onCreate():172:172 -> onCreate
     20:29:void onCreate():173:173 -> onCreate
     30:32:void onCreate():177:177 -> onCreate
-    33:48:void markAlive(boolean):443:443 -> onCreate
+    33:48:void markAlive(boolean):452:452 -> onCreate
     33:48:void onCreate():178 -> onCreate
     49:57:void onCreate():180:180 -> onCreate
     58:60:void onCreate():181:181 -> onCreate
@@ -99787,7 +99795,7 @@ com.rickmschulz.dnsautoswitcher.DNSService -> com.rickmschulz.dnsautoswitcher.DN
     77:82:void onDestroy():241 -> onDestroy
     83:87:void com.rickmschulz.dnsautoswitcher.Reconciler.restoreOnStop(android.content.Context):280:280 -> onDestroy
     83:87:void onDestroy():241 -> onDestroy
-    88:103:void markAlive(boolean):443:443 -> onDestroy
+    88:103:void markAlive(boolean):452:452 -> onDestroy
     88:103:void onDestroy():243 -> onDestroy
     104:106:void androidx.core.app.ServiceCompat.stopForeground(android.app.Service,int):102:102 -> onDestroy
     104:106:void onDestroy():244 -> onDestroy
@@ -99822,47 +99830,47 @@ com.rickmschulz.dnsautoswitcher.DNSService$$ExternalSyntheticLambda0 -> pa:
     8:13:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
       # {"id":"com.android.tools.r8.synthesized"}
     14:21:void DNSService$$ExternalSyntheticLambda0.run():0:0 -> run
-    22:24:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():411:411 -> run
-    22:24:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    25:26:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():412:412 -> run
-    25:26:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    27:30:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():414:414 -> run
-    27:30:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    31:35:void com.rickmschulz.dnsautoswitcher.DNSService.updateNotification():469:469 -> run
-    31:35:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():415 -> run
-    31:35:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    36:45:void com.rickmschulz.dnsautoswitcher.DNSService.updateNotification():472:472 -> run
-    36:45:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():415 -> run
-    36:45:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    46:56:void com.rickmschulz.dnsautoswitcher.DNSService.updateNotification():474:474 -> run
-    46:56:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():415 -> run
-    46:56:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    57:60:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():417:417 -> run
-    57:60:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    61:64:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():418:418 -> run
-    61:64:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    65:66:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():421:421 -> run
-    65:66:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    67:71:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():422:422 -> run
-    67:71:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    72:78:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():423:423 -> run
-    72:78:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    79:88:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():424:424 -> run
-    79:88:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    89:92:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():431:431 -> run
-    89:92:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    93:99:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():432:432 -> run
-    93:99:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    100:101:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():433:433 -> run
-    100:101:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    102:123:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():434:434 -> run
-    102:123:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    124:130:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():435:435 -> run
-    124:130:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    131:138:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():436:436 -> run
-    131:138:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
-    139:144:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():438:438 -> run
-    139:144:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    22:26:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():411:411 -> run
+    22:26:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    27:29:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():412:412 -> run
+    27:29:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    30:33:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():419:419 -> run
+    30:33:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    34:37:void com.rickmschulz.dnsautoswitcher.DNSService.updateNotification():478:478 -> run
+    34:37:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():420 -> run
+    34:37:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    38:47:void com.rickmschulz.dnsautoswitcher.DNSService.updateNotification():481:481 -> run
+    38:47:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():420 -> run
+    38:47:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    48:60:void com.rickmschulz.dnsautoswitcher.DNSService.updateNotification():483:483 -> run
+    48:60:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():420 -> run
+    48:60:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    61:68:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():422:422 -> run
+    61:68:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    69:72:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():427:427 -> run
+    69:72:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    73:74:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():430:430 -> run
+    73:74:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    75:79:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():431:431 -> run
+    75:79:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    80:86:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():432:432 -> run
+    80:86:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    87:96:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():433:433 -> run
+    87:96:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    97:100:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():440:440 -> run
+    97:100:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    101:107:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():441:441 -> run
+    101:107:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    108:109:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():442:442 -> run
+    108:109:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    110:131:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():443:443 -> run
+    110:131:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    132:138:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():444:444 -> run
+    132:138:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    139:146:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():445:445 -> run
+    139:146:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
+    147:152:void com.rickmschulz.dnsautoswitcher.DNSService.reconcile():447:447 -> run
+    147:152:void DNSService$$ExternalSyntheticLambda0.run():0 -> run
 com.rickmschulz.dnsautoswitcher.DNSService$2 -> qa:
 # {"id":"sourceFile","fileName":"DNSService.java"}
     com.rickmschulz.dnsautoswitcher.DNSService this$0 -> a
