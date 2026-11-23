@@ -101,6 +101,10 @@ If switching is slow rather than wrong, the service is being stopped by the syst
 
 ## Changelog
 
+**v.1.2.1**
+
+* **Fixed:** the app crashed, and kept crashing on every launch, when a VPN was active over Wi-Fi. The VPN network was mistaken for the Wi-Fi network and its details were read as if they were Wi-Fi details. VPN networks are now ignored when looking for the Wi-Fi name, and a failed check no longer stops the service.
+
 **v1.2**
 
 All credit for this release goes to [@tanc](https://github.com/tanc) for completely refactoring the core background service for modern Android reliability and building the new multiple-network feature.

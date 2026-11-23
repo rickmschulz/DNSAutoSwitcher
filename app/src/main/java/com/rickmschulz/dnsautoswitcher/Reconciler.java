@@ -312,7 +312,13 @@ final class Reconciler {
             return false;
         }
         NetworkCapabilities caps = cm.getNetworkCapabilities(network);
-        return caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI);
+        // A VPN running over Wi-Fi reports TRANSPORT_WIFI as well, because it inherits the
+        // transports of its underlying network. It is not the Wi-Fi network itself: its transport
+        // info is not a WifiInfo and carries no SSID. The physical Wi-Fi network is still
+        // enumerated separately, so skipping the VPN finds the real one.
+        return caps != null
+                && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                && !caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN);
     }
 
     private static String ssidFromCapabilities(ConnectivityManager cm, Network network) {
@@ -320,8 +326,13 @@ final class Reconciler {
         if (caps == null) {
             return null;
         }
-        WifiInfo info = (WifiInfo) caps.getTransportInfo();
-        return SwitchPolicy.normalizeSsid(info == null ? null : info.getSSID());
+        // Never cast blindly: anything other than a plain Wi-Fi network (a VPN, for one) carries a
+        // different TransportInfo, and the cast used to crash the whole app.
+        Object transportInfo = caps.getTransportInfo();
+        if (!(transportInfo instanceof WifiInfo)) {
+            return null;
+        }
+        return SwitchPolicy.normalizeSsid(((WifiInfo) transportInfo).getSSID());
     }
 
     @SuppressWarnings("deprecation") // isWifiEnabled/getNetworkId are the only connection test here

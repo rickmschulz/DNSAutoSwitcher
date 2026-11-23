@@ -411,8 +411,17 @@ public class DNSService extends Service {
         boolean confirming = verifying;
         verifying = false;
 
-        SwitchPolicy.State state = Reconciler.evaluate(this);
-        updateNotification();
+        // This runs on the worker thread, where an uncaught exception takes the whole process
+        // down and, with the service marked enabled, crashes the app again on every launch.
+        // An evaluation that fails is treated like one without enough information: retried.
+        SwitchPolicy.State state;
+        try {
+            state = Reconciler.evaluate(this);
+            updateNotification();
+        } catch (RuntimeException e) {
+            Log.e(TAG, "evaluation failed", e);
+            state = null;
+        }
 
         if (state != null) {
             retriesLeft = 0;
